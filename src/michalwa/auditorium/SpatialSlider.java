@@ -2,9 +2,11 @@ package michalwa.auditorium;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RadialGradientPaint;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -69,6 +71,14 @@ class SpatialSlider<TData> extends JComponent {
         addMouseMotionListener(mouseAdapter);
     }
 
+    public float getValueX() {
+        return valueX;
+    }
+
+    public float getValueY() {
+        return valueY;
+    }
+
     public List<SpatialRegion<TData>> getRegions() {
         return regions;
     }
@@ -96,6 +106,7 @@ class SpatialSlider<TData> extends JComponent {
         super.paintComponent(g);
 
         Graphics2D g2d = (Graphics2D)g;
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g2d.setColor(getBackground());
         g2d.fillRect(0, 0, getWidth(), getHeight());
@@ -108,22 +119,31 @@ class SpatialSlider<TData> extends JComponent {
         drawVerticalLine(g, padding + getAreaWidth() / 2, padding, getAreaHeight());
         drawHorizontalLine(g, padding, padding + getAreaHeight() / 2, getAreaWidth());
 
-        for (int i = 0; i < regions.size(); i++) {
-            SpatialRegion<TData> region = regions.get(i);
-            Color regionColor = regionColors[i % regionColors.length];
+        g2d.setStroke(new BasicStroke());
 
-            float cx = padding + region.centerX * getAreaWidth();
-            float cy = padding + region.centerY * getAreaHeight();
-            float r = region.radius * Math.min(getAreaWidth(), getAreaHeight());
+        for (int pass = 0; pass < 2; pass++) {
+            for (int i = 0; i < regions.size(); i++) {
+                SpatialRegion<TData> region = regions.get(i);
+                Color regionColor = regionColors[i % regionColors.length];
 
-            g2d.setPaint(new RadialGradientPaint(
-                cx,
-                cy,
-                r,
-                new float[] { 0.0f, 1.0f },
-                new Color[] { regionColor, new Color(0, 0, 0, 0) }
-            ));
-            g2d.fillOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
+                float cx = padding + region.centerX * getAreaWidth();
+                float cy = padding + region.centerY * getAreaHeight();
+                float r = region.radius * Math.min(getAreaWidth(), getAreaHeight());
+
+                if (pass == 0) {
+                    g2d.setPaint(new RadialGradientPaint(
+                        cx,
+                        cy,
+                        r,
+                        new float[] { 0.0f, 1.0f },
+                        new Color[] { regionColor, new Color(0, 0, 0, 0) }
+                    ));
+                    g2d.fillOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
+                } else if (pass == 1) {
+                    g2d.setColor(regionColor);
+                    g2d.drawOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
+                }
+            }
         }
 
         g2d.setClip(null);
@@ -137,7 +157,6 @@ class SpatialSlider<TData> extends JComponent {
         );
 
         g2d.setColor(getForeground());
-        g2d.setStroke(new BasicStroke());
         g2d.drawRoundRect(
             padding,
             padding,
