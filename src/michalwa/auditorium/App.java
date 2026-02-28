@@ -3,6 +3,7 @@ package michalwa.auditorium;
 import java.util.Optional;
 
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
@@ -18,32 +19,29 @@ class App extends JFrame implements Runnable {
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        SpatialSlider<Clip> spatialSlider = new SpatialSlider<Clip>(
+        SpatialSlider<Audio> spatialSlider = new SpatialSlider<Audio>(
             new SpatialSlider.DataFactory<>() {
                 @Override
-                public Optional<Clip> getData() {
-                    return Optional.ofNullable(FilePicker.loadAudioClip());
+                public Optional<Audio> getData() {
+                    return Optional.ofNullable(FilePicker.loadAudio());
                 }
             }
         );
-        spatialSlider.addListener(new SpatialSlider.Listener<Clip>() {
+        spatialSlider.addListener(new SpatialSlider.Listener<Audio>() {
             @Override
             public void valueChanged(float x, float y) {
-                for (SpatialRegion<Clip> region : spatialSlider.getRegions()) {
+                for (SpatialRegion<Audio> region : spatialSlider.getRegions()) {
                     float dx = x - region.centerX;
                     float dy = y - region.centerY;
                     float squareDist = dx * dx + dy * dy;
+                    float squareRadius = region.radius * region.radius;
 
-                    if (squareDist <= region.radius * region.radius) {
-                        region.getData().loop(Clip.LOOP_CONTINUOUSLY);
-                    } else {
-                        region.getData().stop();
-                    }
+                    region.getData().setVolume(1.0f - squareDist / squareRadius);
                 }
             }
 
             @Override
-            public void regionAdded(SpatialRegion<Clip> region) {}
+            public void regionAdded(SpatialRegion<Audio> region) {}
         });
 
         add(spatialSlider);

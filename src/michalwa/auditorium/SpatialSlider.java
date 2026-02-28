@@ -100,19 +100,11 @@ class SpatialSlider<TData> extends JComponent {
         g2d.setColor(getBackground());
         g2d.fillRect(0, 0, getWidth(), getHeight());
 
-        g2d.setColor(getForeground());
-        g2d.drawRoundRect(
-            padding,
-            padding,
-            getAreaWidth(),
-            getAreaHeight(),
-            roundSize,
-            roundSize
-        );
-
         g2d.setClip(padding, padding, getAreaWidth(), getAreaHeight());
 
+        g2d.setColor(getForeground());
         g2d.setStroke(DASH_STROKE);
+
         drawVerticalLine(g, padding + getAreaWidth() / 2, padding, getAreaHeight());
         drawHorizontalLine(g, padding, padding + getAreaHeight() / 2, getAreaWidth());
 
@@ -135,12 +127,24 @@ class SpatialSlider<TData> extends JComponent {
         }
 
         g2d.setClip(null);
+
         g2d.setColor(getForeground());
         g2d.fillOval(
             padding + getHandleXOffset() - handleRadius,
             padding + getHandleYOffset() - handleRadius,
             handleRadius * 2,
             handleRadius * 2
+        );
+
+        g2d.setColor(getForeground());
+        g2d.setStroke(new BasicStroke());
+        g2d.drawRoundRect(
+            padding,
+            padding,
+            getAreaWidth(),
+            getAreaHeight(),
+            roundSize,
+            roundSize
         );
     }
 
