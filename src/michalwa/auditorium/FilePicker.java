@@ -10,12 +10,14 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 import com.adonax.audiocue.AudioCue;
 
+import michalwa.auditorium.playback.SpatialAudio;
+
 class FilePicker {
     interface AudioFactory {
-        Audio createAudio(String name, AudioCue cue);
+        SpatialAudio createAudio(String name, AudioCue cue);
     }
 
-    public static Audio loadAudio(AudioFactory factory) {
+    public static SpatialAudio loadAudio(AudioFactory factory) {
         FileDialog fileDialog = new FileDialog((Dialog)null, "Open audio clip", FileDialog.LOAD);
         fileDialog.setVisible(true);
 

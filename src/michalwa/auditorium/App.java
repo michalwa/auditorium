@@ -2,20 +2,21 @@ package michalwa.auditorium;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.util.Optional;
 
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
+import michalwa.auditorium.playback.SpatialAudio;
+import michalwa.auditorium.playback.AudioChirp;
+import michalwa.auditorium.playback.AudioLoop;
+
 class App extends JFrame implements Runnable {
-    SpatialSlider<Audio> spatialSlider;
+    SpatialSlider<SpatialAudio> spatialSlider;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new App());
@@ -25,13 +26,13 @@ class App extends JFrame implements Runnable {
     public void run() {
         setTitle("auditorium");
 
-        spatialSlider = new SpatialSlider<Audio>(SliderPopupMenu::new);
+        spatialSlider = new SpatialSlider<SpatialAudio>(SliderPopupMenu::new);
         spatialSlider.setMinimumSize(new Dimension(400, 400));
         spatialSlider.setPreferredSize(new Dimension(400, 400));
 
         SpatialRegionTable table = new SpatialRegionTable();
 
-        spatialSlider.addListener(new SpatialSlider.Listener<Audio>() {
+        spatialSlider.addListener(new SpatialSlider.Listener<SpatialAudio>() {
             @Override
             public void valueChanged(float x, float y) {
                 updateAudio();
@@ -39,7 +40,7 @@ class App extends JFrame implements Runnable {
             }
 
             @Override
-            public void regionAdded(SpatialRegion<Audio> region) {
+            public void regionAdded(SpatialRegion<SpatialAudio> region) {
                 updateAudio();
                 table.addRegion(region);
             }
@@ -69,7 +70,7 @@ class App extends JFrame implements Runnable {
     }
 
     private void updateAudio() {
-        for (SpatialRegion<Audio> region : spatialSlider.getRegions()) {
+        for (SpatialRegion<SpatialAudio> region : spatialSlider.getRegions()) {
             float dx = spatialSlider.getValueX() - region.centerX;
             float dy = spatialSlider.getValueY() - region.centerY;
             float squareDist = dx * dx + dy * dy;
@@ -82,15 +83,15 @@ class App extends JFrame implements Runnable {
     class SliderPopupMenu extends JPopupMenu {
         SliderPopupMenu(float x, float y) {
             add(new JMenuItem("Add loop")).addActionListener(e -> {
-                Audio data = FilePicker.loadAudio(AudioLoop::new);
+                SpatialAudio data = FilePicker.loadAudio(AudioLoop::new);
                 if (data != null)
-                    spatialSlider.addRegion(new SpatialRegion<Audio>(x, y, 0.4f, data));
+                    spatialSlider.addRegion(new SpatialRegion<SpatialAudio>(x, y, 0.4f, data));
             });
 
             add(new JMenuItem("Add chirp")).addActionListener(e -> {
-                Audio data = FilePicker.loadAudio(AudioChirp::new);
+                SpatialAudio data = FilePicker.loadAudio(AudioChirp::new);
                 if (data != null)
-                    spatialSlider.addRegion(new SpatialRegion<Audio>(x, y, 0.4f, data));
+                    spatialSlider.addRegion(new SpatialRegion<SpatialAudio>(x, y, 0.4f, data));
             });
         }
     }

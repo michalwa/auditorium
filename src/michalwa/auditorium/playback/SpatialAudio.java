@@ -1,14 +1,14 @@
-package michalwa.auditorium;
+package michalwa.auditorium.playback;
 
 import com.adonax.audiocue.AudioCue;
 
-abstract class Audio {
+public abstract class SpatialAudio {
     private String name;
     protected AudioCue audioCue;
     protected int instanceId;
     protected float effectiveVolume = 1.0f;
 
-    Audio(String name, AudioCue audioCue) {
+    SpatialAudio(String name, AudioCue audioCue) {
         this.name = name;
         this.audioCue = audioCue;
 

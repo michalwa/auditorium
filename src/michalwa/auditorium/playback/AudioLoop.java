@@ -1,8 +1,8 @@
-package michalwa.auditorium;
+package michalwa.auditorium.playback;
 
 import com.adonax.audiocue.AudioCue;
 
-class AudioLoop extends Audio {
+public class AudioLoop extends SpatialAudio {
     public AudioLoop(String name, AudioCue audioCue) {
         super(name, audioCue);
         setLooping(true);

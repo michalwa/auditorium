@@ -1,4 +1,4 @@
-package michalwa.auditorium;
+package michalwa.auditorium.playback;
 
 import javax.swing.Timer;
 
@@ -6,7 +6,7 @@ import com.adonax.audiocue.AudioCue;
 import com.adonax.audiocue.AudioCueInstanceEvent;
 import com.adonax.audiocue.AudioCueListener;
 
-class AudioChirp extends Audio {
+public class AudioChirp extends SpatialAudio {
     Timer timer = new Timer(0, e -> trigger()) {{ setRepeats(false); }};
     public float minDelaySeconds = 1.0f, maxDelaySeconds = 5.0f;
 

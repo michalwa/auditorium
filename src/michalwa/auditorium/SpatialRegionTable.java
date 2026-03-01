@@ -2,8 +2,11 @@ package michalwa.auditorium;
 
 import javax.swing.JTable;
 
+import michalwa.auditorium.playback.AudioChirp;
+import michalwa.auditorium.playback.SpatialAudio;
+
 class SpatialRegionTable extends JTable {
-    private SimpleTableModel<SpatialRegion<Audio>> model = new SimpleTableModel<>() {{
+    private SimpleTableModel<SpatialRegion<SpatialAudio>> model = new SimpleTableModel<>() {{
         addColumn("Type", String.class, r -> r.getData().getTypeName());
         addColumn("Name", String.class,
             r -> r.getData().getName(),
@@ -38,7 +41,7 @@ class SpatialRegionTable extends JTable {
         getColumnModel().getColumn(1).setPreferredWidth(300);
     }
 
-    public void addRegion(SpatialRegion<Audio> region) {
+    public void addRegion(SpatialRegion<SpatialAudio> region) {
         model.addRow(region);
         revalidate();
         repaint();
