@@ -3,8 +3,8 @@ package michalwa.auditorium.playback;
 import com.adonax.audiocue.AudioCue;
 
 public class AudioLoop extends SpatialAudio {
-    public AudioLoop(String name, AudioCue audioCue) {
-        super(name, audioCue);
+    public AudioLoop(String name, AudioCue[] audioCues) {
+        super(name, audioCues);
         setLooping(true);
     }
 
@@ -17,12 +17,14 @@ public class AudioLoop extends SpatialAudio {
     public void setVolume(float volume) {
         super.setVolume(volume);
 
-        if (volume > 0.0f) {
-            if (!audioCue.getIsPlaying(instanceId))
-                audioCue.start(instanceId);
-        } else {
-            if (audioCue.getIsPlaying(instanceId))
-                audioCue.stop(instanceId);
+        for (int i = 0; i < audioCues.length; i++) {
+            if (volume > 0.0f) {
+                if (!audioCues[i].getIsPlaying(instanceIds[i]))
+                    audioCues[i].start(instanceIds[i]);
+            } else {
+                if (audioCues[i].getIsPlaying(instanceIds[i]))
+                    audioCues[i].stop(instanceIds[i]);
+            }
         }
     }
 }

@@ -1,18 +1,20 @@
 package michalwa.auditorium.playback;
 
+import java.util.stream.Stream;
+
 import com.adonax.audiocue.AudioCue;
 
 public abstract class SpatialAudio {
     private String name;
-    protected AudioCue audioCue;
-    protected int instanceId;
+    protected AudioCue[] audioCues;
+    protected int[] instanceIds;
     protected float effectiveVolume = 1.0f;
 
-    SpatialAudio(String name, AudioCue audioCue) {
+    SpatialAudio(String name, AudioCue[] audioCues) {
         this.name = name;
-        this.audioCue = audioCue;
+        this.audioCues = audioCues;
 
-        instanceId = audioCue.obtainInstance();
+        instanceIds = Stream.of(audioCues).mapToInt(AudioCue::obtainInstance).toArray();
     }
 
     public abstract String getTypeName();
@@ -28,8 +30,10 @@ public abstract class SpatialAudio {
     public void setVolume(float volume) {
         effectiveVolume = Math.clamp(volume, 0.0f, 1.0f);
 
-        if (audioCue.getIsActive(instanceId))
-            audioCue.setVolume(instanceId, volume);
+        for (int i = 0; i < audioCues.length; i++) {
+            if (audioCues[i].getIsActive(instanceIds[i]))
+                audioCues[i].setVolume(instanceIds[i], volume);
+        }
     }
 
     public float getEffectiveVolume() {
@@ -37,6 +41,8 @@ public abstract class SpatialAudio {
     }
 
     protected void setLooping(boolean looping) {
-        audioCue.setLooping(instanceId, looping ? -1 : 0);
+        for (int i = 0; i < audioCues.length; i++) {
+            audioCues[i].setLooping(instanceIds[i], looping ? -1 : 0);
+        }
     }
 }
