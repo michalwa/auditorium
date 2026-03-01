@@ -1,5 +1,7 @@
 package michalwa.auditorium;
 
+import java.awt.Color;
+
 import javax.swing.JTable;
 
 import michalwa.auditorium.playback.AudioChirp;
@@ -8,6 +10,7 @@ import michalwa.auditorium.playback.SpatialAudio;
 class SpatialRegionTable extends JTable {
     private SimpleTableModel<SpatialRegion<SpatialAudio>> model = new SimpleTableModel<>() {{
         addColumn("Type", String.class, r -> r.getData().getTypeName());
+        addColumn("Color", Color.class, r -> r.color, (r, v) -> r.color = v);
         addColumn("Name", String.class,
             r -> r.getData().getName(),
             (r, v) -> r.getData().setName(v));
@@ -38,7 +41,13 @@ class SpatialRegionTable extends JTable {
 
     SpatialRegionTable() {
         setModel(model);
-        getColumnModel().getColumn(1).setPreferredWidth(300);
+
+        ColorCellEditor colorCellEditor = new ColorCellEditor();
+
+        setDefaultEditor(Color.class, colorCellEditor);
+        setDefaultRenderer(Color.class, colorCellEditor);
+
+        getColumnModel().getColumn(2).setPreferredWidth(300);
     }
 
     public void addRegion(SpatialRegion<SpatialAudio> region) {

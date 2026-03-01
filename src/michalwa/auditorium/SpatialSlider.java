@@ -26,11 +26,7 @@ class SpatialSlider<TData> extends JComponent {
     private int handleRadius = 4;
     private List<SpatialRegion<TData>> regions = new ArrayList<>();
     private List<Listener<TData>> listenerList = new ArrayList<>();
-    private Color[] regionColors = new Color[] {
-        Color.BLUE,
-        Color.RED,
-        Color.GREEN,
-    };
+
     private PopupFactory popupFactory;
 
     private static Stroke DASH_STROKE = new BasicStroke(
@@ -117,26 +113,23 @@ class SpatialSlider<TData> extends JComponent {
         g2d.setStroke(new BasicStroke());
 
         for (int pass = 0; pass < 2; pass++) {
-            for (int i = 0; i < regions.size(); i++) {
-                SpatialRegion<TData> region = regions.get(i);
-                Color regionColor = regionColors[i % regionColors.length];
-
+            for (SpatialRegion<TData> region : regions) {
                 float cx = padding + region.centerX * getAreaWidth();
                 float cy = padding + region.centerY * getAreaHeight();
                 float r = region.radius * Math.min(getAreaWidth(), getAreaHeight());
 
                 if (pass == 0) {
+                    g2d.setColor(region.color);
+                    g2d.drawOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
+                } else if (pass == 1) {
                     g2d.setPaint(new RadialGradientPaint(
                         cx,
                         cy,
                         r,
                         new float[] { 0.0f, 1.0f },
-                        new Color[] { regionColor, new Color(0, 0, 0, 0) }
+                        new Color[] { region.color, new Color(0, 0, 0, 0) }
                     ));
                     g2d.fillOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
-                } else if (pass == 1) {
-                    g2d.setColor(regionColor);
-                    g2d.drawOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
                 }
             }
         }

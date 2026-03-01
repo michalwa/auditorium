@@ -1,0 +1,58 @@
+package michalwa.auditorium;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+
+class ColorControl extends JButton {
+    private Color value;
+    private List<Runnable> cancelListeners = new ArrayList<>();
+
+    ColorControl(Color value) {
+        this.value = value;
+
+        addActionListener(e -> {
+            Color newValue = JColorChooser.showDialog(this, "Pick a color", value);
+            if (newValue != null) {
+                setValue(newValue);
+            } else {
+                for (Runnable listener : cancelListeners) {
+                    listener.run();
+                }
+            }
+        });
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(30, 10);
+    }
+
+    public void setValue(Color value) {
+        Color oldValue = this.value;
+        this.value = value;
+        firePropertyChange("value", oldValue, value);
+        repaint();
+    }
+
+    public Color getValue() {
+        return value;
+    }
+
+    public void addCancelListener(Runnable listener) {
+        cancelListeners.add(listener);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        g.setColor(value);
+        g.fillRect(0, 0, getWidth(), getHeight());
+    }
+}
