@@ -11,7 +11,11 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import com.adonax.audiocue.AudioCue;
 
 class FilePicker {
-    public static Audio loadAudio() {
+    interface AudioFactory {
+        Audio createAudio(String name, AudioCue cue);
+    }
+
+    public static Audio loadAudio(AudioFactory factory) {
         FileDialog fileDialog = new FileDialog((Dialog)null, "Open audio clip", FileDialog.LOAD);
         fileDialog.setVisible(true);
 
@@ -21,7 +25,7 @@ class FilePicker {
         try {
             AudioCue cue = AudioCue.makeStereoCue(file.toURI().toURL(), 1);
             cue.open();
-            return new Audio(file.getName(), cue);
+            return factory.createAudio(file.getName(), cue);
         } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
             System.out.println("Could not open file: " + e.getMessage());
             return null;

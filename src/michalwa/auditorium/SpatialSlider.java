@@ -25,13 +25,13 @@ class SpatialSlider<TData> extends JComponent {
     private int roundSize = 6;
     private int handleRadius = 4;
     private List<SpatialRegion<TData>> regions = new ArrayList<>();
-    private DataFactory<TData> dataFactory;
     private List<Listener<TData>> listenerList = new ArrayList<>();
     private Color[] regionColors = new Color[] {
         Color.BLUE,
         Color.RED,
         Color.GREEN,
     };
+    private PopupFactory popupFactory;
 
     private static Stroke DASH_STROKE = new BasicStroke(
         1.0f,
@@ -42,8 +42,8 @@ class SpatialSlider<TData> extends JComponent {
         0.0f
     );
 
-    SpatialSlider(DataFactory<TData> dataFactory) {
-        this.dataFactory = dataFactory;
+    SpatialSlider(PopupFactory popupFactory) {
+        this.popupFactory = popupFactory;
 
         setBackground(Color.BLACK);
         setForeground(Color.LIGHT_GRAY);
@@ -83,18 +83,13 @@ class SpatialSlider<TData> extends JComponent {
         return regions;
     }
 
-    public void addRegion(float x, float y) {
-        Optional<TData> data = dataFactory.getData();
+    public void addRegion(SpatialRegion<TData> region) {
+        regions.add(region);
 
-        if (data.isPresent()) {
-            SpatialRegion<TData> region = new SpatialRegion<>(x, y, 0.5f, data.get());
-            regions.add(region);
+        for (Listener<TData> listener : listenerList)
+            listener.regionAdded(region);
 
-            for (Listener<TData> listener : listenerList)
-                listener.regionAdded(region);
-
-            repaint();
-        }
+        repaint();
     }
 
     public void addListener(Listener<TData> listener) {
@@ -210,12 +205,8 @@ class SpatialSlider<TData> extends JComponent {
     }
 
     private void showContextMenu(MouseEvent e) {
-        new ContextMenu(getNewValueX(e), getNewValueY(e))
+        popupFactory.createPopup(getNewValueX(e), getNewValueY(e))
             .show(e.getComponent(), e.getX(), e.getY());
-    }
-
-    interface DataFactory<TData> {
-        Optional<TData> getData();
     }
 
     interface Listener<TData> {
@@ -223,15 +214,7 @@ class SpatialSlider<TData> extends JComponent {
         void regionAdded(SpatialRegion<TData> region);
     }
 
-    private class ContextMenu extends JPopupMenu {
-        private float valueX, valueY;
-
-        ContextMenu(float valueX, float valueY) {
-            this.valueX = valueX;
-            this.valueY = valueY;
-
-            add(new JMenuItem("Add region"))
-                .addActionListener((e) -> addRegion(valueX, valueY));
-        }
+    interface PopupFactory {
+        JPopupMenu createPopup(float x, float y);
     }
 }

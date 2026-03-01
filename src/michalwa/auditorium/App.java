@@ -6,7 +6,9 @@ import java.util.Optional;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
@@ -23,14 +25,7 @@ class App extends JFrame implements Runnable {
     public void run() {
         setTitle("auditorium");
 
-        spatialSlider = new SpatialSlider<Audio>(
-            new SpatialSlider.DataFactory<>() {
-                @Override
-                public Optional<Audio> getData() {
-                    return Optional.ofNullable(FilePicker.loadAudio());
-                }
-            }
-        );
+        spatialSlider = new SpatialSlider<Audio>(SliderPopupMenu::new);
         spatialSlider.setMinimumSize(new Dimension(400, 400));
         spatialSlider.setPreferredSize(new Dimension(400, 400));
 
@@ -81,6 +76,22 @@ class App extends JFrame implements Runnable {
             float squareRadius = region.radius * region.radius;
 
             region.getData().setVolume(1.0f - squareDist / squareRadius);
+        }
+    }
+
+    class SliderPopupMenu extends JPopupMenu {
+        SliderPopupMenu(float x, float y) {
+            add(new JMenuItem("Add loop")).addActionListener(e -> {
+                Audio data = FilePicker.loadAudio(AudioLoop::new);
+                if (data != null)
+                    spatialSlider.addRegion(new SpatialRegion<Audio>(x, y, 0.4f, data));
+            });
+
+            add(new JMenuItem("Add chirp")).addActionListener(e -> {
+                Audio data = FilePicker.loadAudio(AudioChirp::new);
+                if (data != null)
+                    spatialSlider.addRegion(new SpatialRegion<Audio>(x, y, 0.4f, data));
+            });
         }
     }
 }
