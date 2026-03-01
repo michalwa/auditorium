@@ -54,7 +54,8 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return columns.get(columnIndex).isEditable();
+        return getValueAt(rowIndex, columnIndex) != null
+            && columns.get(columnIndex).isEditable();
     }
 
     @Override

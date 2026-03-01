@@ -9,6 +9,11 @@ class AudioLoop extends Audio {
     }
 
     @Override
+    public String getTypeName() {
+        return "loop";
+    }
+
+    @Override
     public void setVolume(float volume) {
         super.setVolume(volume);
 

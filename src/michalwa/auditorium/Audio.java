@@ -15,6 +15,8 @@ abstract class Audio {
         instanceId = audioCue.obtainInstance();
     }
 
+    public abstract String getTypeName();
+
     public String getName() {
         return name;
     }

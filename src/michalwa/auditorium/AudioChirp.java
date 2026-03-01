@@ -8,9 +8,9 @@ import com.adonax.audiocue.AudioCueListener;
 
 class AudioChirp extends Audio {
     Timer timer = new Timer(0, e -> trigger()) {{ setRepeats(false); }};
-    private float minDelaySeconds = 1.0f, maxDelaySeconds = 5.0f;
+    public float minDelaySeconds = 1.0f, maxDelaySeconds = 5.0f;
 
-    public AudioChirp(String name, AudioCue audioCue) {
+	public AudioChirp(String name, AudioCue audioCue) {
         super(name, audioCue);
 
         audioCue.addAudioCueListener(new AudioCueListener() {
@@ -28,6 +28,11 @@ class AudioChirp extends Audio {
         });
 
         restartTimer();
+    }
+
+    @Override
+    public String getTypeName() {
+        return "chirp";
     }
 
     private void restartTimer() {
