@@ -40,6 +40,15 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>net.revelc.code.formatter</groupId>
+        <artifactId>formatter-maven-plugin</artifactId>
+        <version>2.29.0</version>
+        <configuration>
+          <encoding>UTF-8</encoding>
+          <configFile>${project.basedir}/formatter.xml</configFile>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

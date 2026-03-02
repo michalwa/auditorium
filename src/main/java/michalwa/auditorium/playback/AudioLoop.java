@@ -19,11 +19,9 @@ public class AudioLoop extends SpatialAudio {
 
         for (int i = 0; i < audioCues.length; i++) {
             if (volume > 0.0f) {
-                if (!audioCues[i].getIsPlaying(instanceIds[i]))
-                    audioCues[i].start(instanceIds[i]);
+                if (!audioCues[i].getIsPlaying(instanceIds[i])) audioCues[i].start(instanceIds[i]);
             } else {
-                if (audioCues[i].getIsPlaying(instanceIds[i]))
-                    audioCues[i].stop(instanceIds[i]);
+                if (audioCues[i].getIsPlaying(instanceIds[i])) audioCues[i].stop(instanceIds[i]);
             }
         }
     }

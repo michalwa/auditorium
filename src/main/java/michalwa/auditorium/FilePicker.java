@@ -2,7 +2,6 @@ package michalwa.auditorium;
 
 import java.awt.Dialog;
 import java.awt.FileDialog;
-import java.io.File;
 import java.io.IOException;
 import java.util.stream.Stream;
 
@@ -23,19 +22,16 @@ class FilePicker {
         fileDialog.setMultipleMode(true);
         fileDialog.setVisible(true);
 
-        AudioCue[] audioCues = Stream
-            .of(fileDialog.getFiles())
-            .map(file -> {
-                try {
-                    AudioCue cue = AudioCue.makeStereoCue(file.toURI().toURL(), 1);
-                    cue.open();
-                    return cue;
-                } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
-                    System.out.println("Could not open file: " + e.getMessage());
-                    return null;
-                }
-            })
-            .toArray(AudioCue[]::new);
+        AudioCue[] audioCues = Stream.of(fileDialog.getFiles()).map(file -> {
+            try {
+                AudioCue cue = AudioCue.makeStereoCue(file.toURI().toURL(), 1);
+                cue.open();
+                return cue;
+            } catch (IOException | UnsupportedAudioFileException | LineUnavailableException e) {
+                System.out.println("Could not open file: " + e.getMessage());
+                return null;
+            }
+        }).toArray(AudioCue[]::new);
 
         if (audioCues.length == 0) return null;
 

@@ -34,12 +34,12 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-       	return columns.size();
+        return columns.size();
     }
 
     @Override
     public int getRowCount() {
-       	return rows.size();
+        return rows.size();
     }
 
     @Override
@@ -54,8 +54,7 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
 
     @Override
     public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return getValueAt(rowIndex, columnIndex) != null
-            && columns.get(columnIndex).isEditable();
+        return getValueAt(rowIndex, columnIndex) != null && columns.get(columnIndex).isEditable();
     }
 
     @Override
@@ -73,7 +72,7 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
 
     class Column<TValue> {
         private String name;
-    	private Class<TValue> klass;
+        private Class<TValue> klass;
         private Function<TRow, TValue> getter;
         private BiConsumer<TRow, TValue> setter;
 
@@ -90,26 +89,26 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
         }
 
         public String getName() {
-    		return name;
-    	}
+            return name;
+        }
 
-    	public Class<TValue> getKlass() {
-    		return klass;
-    	}
+        public Class<TValue> getKlass() {
+            return klass;
+        }
 
-    	public boolean isEditable() {
-    		return setter != null;
-    	}
+        public boolean isEditable() {
+            return setter != null;
+        }
 
-    	public TValue getValue(TRow row) {
-    	    return getter.apply(row);
-    	}
+        public TValue getValue(TRow row) {
+            return getter.apply(row);
+        }
 
-    	public void setValue(TRow row, Object value) {
-    	    if (setter == null)
-    			throw new IllegalStateException("Column " + name + " is not editable");
+        public void setValue(TRow row, Object value) {
+            if (setter == null)
+                throw new IllegalStateException("Column " + name + " is not editable");
 
-    		setter.accept(row, klass.cast(value));
-    	}
+            setter.accept(row, klass.cast(value));
+        }
     }
 }

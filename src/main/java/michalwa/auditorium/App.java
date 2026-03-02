@@ -1,7 +1,6 @@
 package michalwa.auditorium;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 
 import javax.swing.JFrame;
@@ -12,9 +11,9 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import michalwa.auditorium.playback.SpatialAudio;
 import michalwa.auditorium.playback.AudioChirp;
 import michalwa.auditorium.playback.AudioLoop;
+import michalwa.auditorium.playback.SpatialAudio;
 
 class App extends JFrame implements Runnable {
     SpatialSlider<SpatialAudio> spatialSlider;
@@ -50,7 +49,7 @@ class App extends JFrame implements Runnable {
         table.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
-               	if (e.getType() == TableModelEvent.UPDATE) {
+                if (e.getType() == TableModelEvent.UPDATE) {
                     updateAudio();
                     spatialSlider.repaint();
                 }

@@ -2,7 +2,6 @@ package michalwa.auditorium;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RadialGradientPaint;
@@ -12,10 +11,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
@@ -82,8 +79,7 @@ class SpatialSlider<TData> extends JComponent {
     public void addRegion(SpatialRegion<TData> region) {
         regions.add(region);
 
-        for (Listener<TData> listener : listenerList)
-            listener.regionAdded(region);
+        for (Listener<TData> listener : listenerList) listener.regionAdded(region);
 
         repaint();
     }
@@ -122,13 +118,15 @@ class SpatialSlider<TData> extends JComponent {
                     g2d.setColor(region.color);
                     g2d.drawOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
                 } else if (pass == 1) {
-                    g2d.setPaint(new RadialGradientPaint(
-                        cx,
-                        cy,
-                        r,
-                        new float[] { 0.0f, 1.0f },
-                        new Color[] { region.color, new Color(0, 0, 0, 0) }
-                    ));
+                    g2d.setPaint(
+                        new RadialGradientPaint(
+                            cx,
+                            cy,
+                            r,
+                            new float[] { 0.0f, 1.0f },
+                            new Color[] { region.color, new Color(0, 0, 0, 0) }
+                        )
+                    );
                     g2d.fillOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
                 }
             }
@@ -145,22 +143,14 @@ class SpatialSlider<TData> extends JComponent {
         );
 
         g2d.setColor(getForeground());
-        g2d.drawRoundRect(
-            padding,
-            padding,
-            getAreaWidth(),
-            getAreaHeight(),
-            roundSize,
-            roundSize
-        );
+        g2d.drawRoundRect(padding, padding, getAreaWidth(), getAreaHeight(), roundSize, roundSize);
     }
 
     private void updateValue(MouseEvent e) {
         valueX = getNewValueX(e);
         valueY = getNewValueY(e);
 
-        for (Listener<TData> listener : listenerList)
-            listener.valueChanged(valueX, valueY);
+        for (Listener<TData> listener : listenerList) listener.valueChanged(valueX, valueY);
 
         repaint();
     }
@@ -204,6 +194,7 @@ class SpatialSlider<TData> extends JComponent {
 
     interface Listener<TData> {
         void valueChanged(float x, float y);
+
         void regionAdded(SpatialRegion<TData> region);
     }
 

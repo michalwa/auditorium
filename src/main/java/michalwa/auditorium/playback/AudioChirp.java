@@ -9,16 +9,17 @@ import com.adonax.audiocue.AudioCueInstanceEvent;
 import com.adonax.audiocue.AudioCueListener;
 
 public class AudioChirp extends SpatialAudio implements AudioCueListener {
-    Timer timer = new Timer(0, e -> trigger()) {{ setRepeats(false); }};
+    Timer timer = new Timer(0, e -> trigger());
     public float minDelaySeconds = 1.0f, maxDelaySeconds = 5.0f;
 
-	public AudioChirp(String name, AudioCue[] audioCues) {
+    public AudioChirp(String name, AudioCue[] audioCues) {
         super(name, audioCues);
 
         for (int i = 0; i < audioCues.length; i++) {
             audioCues[i].addAudioCueListener(this);
         }
 
+        timer.setRepeats(false);
         restartTimer();
     }
 
@@ -29,8 +30,7 @@ public class AudioChirp extends SpatialAudio implements AudioCueListener {
 
     @Override
     public void instanceEventOccurred(AudioCueInstanceEvent event) {
-        if (event.type == AudioCueInstanceEvent.Type.STOP_INSTANCE)
-            restartTimer();
+        if (event.type == AudioCueInstanceEvent.Type.STOP_INSTANCE) restartTimer();
     }
 
     @Override
@@ -55,10 +55,7 @@ public class AudioChirp extends SpatialAudio implements AudioCueListener {
     }
 
     private int randomDelayMillis() {
-        return (int)((
-            minDelaySeconds
-                + (float)Math.random()
-                * (maxDelaySeconds - minDelaySeconds)
-            ) * 1000.0f);
+        return (int)((minDelaySeconds + (float)Math.random() * (maxDelaySeconds - minDelaySeconds))
+            * 1000.0f);
     }
 }

@@ -8,10 +8,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
-class ColorCellEditor
-    extends AbstractCellEditor
-    implements TableCellEditor, TableCellRenderer
-{
+class ColorCellEditor extends AbstractCellEditor implements TableCellEditor, TableCellRenderer {
     ColorControl renderer = new ColorControl(Color.BLACK);
     ColorControl editor = new ColorControl(Color.BLACK);
 
