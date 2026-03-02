@@ -11,21 +11,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
 class SpatialSlider<TData> extends JComponent {
-    private float valueX = 0.0f, valueY = 0.0f;
-    private int padding = 20;
-    private int roundSize = 6;
-    private int handleRadius = 4;
-    private List<SpatialRegion<TData>> regions = new ArrayList<>();
-    private List<Listener<TData>> listenerList = new ArrayList<>();
-
-    private PopupFactory popupFactory;
-
     private static Stroke DASH_STROKE = new BasicStroke(
         1.0f,
         BasicStroke.CAP_SQUARE,
@@ -34,6 +24,15 @@ class SpatialSlider<TData> extends JComponent {
         new float[] { 4.0f, 8.0f },
         0.0f
     );
+    private float valueX = 0.0f, valueY = 0.0f;
+    private int padding = 20;
+    private int roundSize = 6;
+    private int handleRadius = 4;
+    private List<SpatialRegion<TData>> regions = new ArrayList<>();
+
+    private List<Listener<TData>> listenerList = new ArrayList<>();
+
+    private PopupFactory popupFactory;
 
     SpatialSlider(PopupFactory popupFactory) {
         this.popupFactory = popupFactory;
@@ -44,6 +43,11 @@ class SpatialSlider<TData> extends JComponent {
 
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
+            public void mouseDragged(MouseEvent e) {
+                if (SwingUtilities.isLeftMouseButton(e)) updateValue(e);
+            }
+
+            @Override
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger()) showContextMenu(e);
                 if (SwingUtilities.isLeftMouseButton(e)) updateValue(e);
@@ -53,27 +57,14 @@ class SpatialSlider<TData> extends JComponent {
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger()) showContextMenu(e);
             }
-
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) updateValue(e);
-            }
         };
 
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
     }
 
-    public float getValueX() {
-        return valueX;
-    }
-
-    public float getValueY() {
-        return valueY;
-    }
-
-    public List<SpatialRegion<TData>> getRegions() {
-        return regions;
+    public void addListener(Listener<TData> listener) {
+        listenerList.add(listener);
     }
 
     public void addRegion(SpatialRegion<TData> region) {
@@ -84,8 +75,48 @@ class SpatialSlider<TData> extends JComponent {
         repaint();
     }
 
-    public void addListener(Listener<TData> listener) {
-        listenerList.add(listener);
+    private void drawHorizontalLine(Graphics g, int x, int y, int width) {
+        g.drawLine(x, y, x + width, y);
+    }
+
+    private void drawVerticalLine(Graphics g, int x, int y, int height) {
+        g.drawLine(x, y, x, y + height);
+    }
+
+    private int getAreaHeight() {
+        return getHeight() - padding * 2;
+    }
+
+    private int getAreaWidth() {
+        return getWidth() - padding * 2;
+    }
+
+    private int getHandleXOffset() {
+        return (int)(valueX * getAreaWidth());
+    }
+
+    private int getHandleYOffset() {
+        return (int)(valueY * getAreaHeight());
+    }
+
+    private float getNewValueX(MouseEvent e) {
+        return Math.clamp((e.getX() - padding) / (float)getAreaWidth(), 0.0f, 1.0f);
+    }
+
+    private float getNewValueY(MouseEvent e) {
+        return Math.clamp((e.getY() - padding) / (float)getAreaHeight(), 0.0f, 1.0f);
+    }
+
+    public List<SpatialRegion<TData>> getRegions() {
+        return regions;
+    }
+
+    public float getValueX() {
+        return valueX;
+    }
+
+    public float getValueY() {
+        return valueY;
     }
 
     @Override
@@ -146,6 +177,11 @@ class SpatialSlider<TData> extends JComponent {
         g2d.drawRoundRect(padding, padding, getAreaWidth(), getAreaHeight(), roundSize, roundSize);
     }
 
+    private void showContextMenu(MouseEvent e) {
+        popupFactory.createPopup(getNewValueX(e), getNewValueY(e))
+            .show(e.getComponent(), e.getX(), e.getY());
+    }
+
     private void updateValue(MouseEvent e) {
         valueX = getNewValueX(e);
         valueY = getNewValueY(e);
@@ -155,47 +191,10 @@ class SpatialSlider<TData> extends JComponent {
         repaint();
     }
 
-    private float getNewValueX(MouseEvent e) {
-        return Math.clamp((e.getX() - padding) / (float)getAreaWidth(), 0.0f, 1.0f);
-    }
-
-    private float getNewValueY(MouseEvent e) {
-        return Math.clamp((e.getY() - padding) / (float)getAreaHeight(), 0.0f, 1.0f);
-    }
-
-    private int getAreaWidth() {
-        return getWidth() - padding * 2;
-    }
-
-    private int getAreaHeight() {
-        return getHeight() - padding * 2;
-    }
-
-    private int getHandleXOffset() {
-        return (int)(valueX * getAreaWidth());
-    }
-
-    private int getHandleYOffset() {
-        return (int)(valueY * getAreaHeight());
-    }
-
-    private void drawVerticalLine(Graphics g, int x, int y, int height) {
-        g.drawLine(x, y, x, y + height);
-    }
-
-    private void drawHorizontalLine(Graphics g, int x, int y, int width) {
-        g.drawLine(x, y, x + width, y);
-    }
-
-    private void showContextMenu(MouseEvent e) {
-        popupFactory.createPopup(getNewValueX(e), getNewValueY(e))
-            .show(e.getComponent(), e.getX(), e.getY());
-    }
-
     interface Listener<TData> {
-        void valueChanged(float x, float y);
-
         void regionAdded(SpatialRegion<TData> region);
+
+        void valueChanged(float x, float y);
     }
 
     interface PopupFactory {

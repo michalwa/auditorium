@@ -2,7 +2,6 @@ package michalwa.auditorium;
 
 import java.awt.Color;
 import java.awt.Component;
-
 import javax.swing.AbstractCellEditor;
 import javax.swing.JTable;
 import javax.swing.table.TableCellEditor;
@@ -15,6 +14,11 @@ class ColorCellEditor extends AbstractCellEditor implements TableCellEditor, Tab
     ColorCellEditor() {
         editor.addPropertyChangeListener("value", e -> stopCellEditing());
         editor.addCancelListener(() -> cancelCellEditing());
+    }
+
+    @Override
+    public Object getCellEditorValue() {
+        return editor.getValue();
     }
 
     @Override
@@ -40,10 +44,5 @@ class ColorCellEditor extends AbstractCellEditor implements TableCellEditor, Tab
     ) {
         renderer.setValue((Color)value);
         return renderer;
-    }
-
-    @Override
-    public Object getCellEditorValue() {
-        return editor.getValue();
     }
 }

@@ -1,8 +1,7 @@
 package michalwa.auditorium.playback;
 
-import java.util.stream.Stream;
-
 import com.adonax.audiocue.AudioCue;
+import java.util.stream.Stream;
 
 public abstract class SpatialAudio {
     private String name;
@@ -17,10 +16,20 @@ public abstract class SpatialAudio {
         instanceIds = Stream.of(audioCues).mapToInt(AudioCue::obtainInstance).toArray();
     }
 
-    public abstract String getTypeName();
+    public float getEffectiveVolume() {
+        return effectiveVolume;
+    }
 
     public String getName() {
         return name;
+    }
+
+    public abstract String getTypeName();
+
+    protected void setLooping(boolean looping) {
+        for (int i = 0; i < audioCues.length; i++) {
+            audioCues[i].setLooping(instanceIds[i], looping ? -1 : 0);
+        }
     }
 
     public void setName(String name) {
@@ -33,16 +42,6 @@ public abstract class SpatialAudio {
         for (int i = 0; i < audioCues.length; i++) {
             if (audioCues[i].getIsActive(instanceIds[i]))
                 audioCues[i].setVolume(instanceIds[i], volume);
-        }
-    }
-
-    public float getEffectiveVolume() {
-        return effectiveVolume;
-    }
-
-    protected void setLooping(boolean looping) {
-        for (int i = 0; i < audioCues.length; i++) {
-            audioCues[i].setLooping(instanceIds[i], looping ? -1 : 0);
         }
     }
 }

@@ -7,7 +7,8 @@ Spatial audio soundscape tool
 ## Development
 
 ```sh
-mvn exec:java         # run the project in development
-mvn package           # package a JAR with bundled dependencies (`target/auditorium-*.*.*-jar-with-dependencies.jar`)
-mvn formatter:format  # format all source files
+mvn verify          # verify project config & code style
+mvn exec:java       # run the project in development
+mvn package         # package a JAR with bundled dependencies (`target/auditorium-*.*.*-jar-with-dependencies.jar`)
+mvn spotless:apply  # format all source files
 ```

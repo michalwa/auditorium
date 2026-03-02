@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-
 import javax.swing.table.AbstractTableModel;
 
 class SimpleTableModel<TRow> extends AbstractTableModel {
@@ -33,13 +32,13 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
     }
 
     @Override
-    public int getColumnCount() {
-        return columns.size();
+    public Class<?> getColumnClass(int columnIndex) {
+        return columns.get(columnIndex).getKlass();
     }
 
     @Override
-    public int getRowCount() {
-        return rows.size();
+    public int getColumnCount() {
+        return columns.size();
     }
 
     @Override
@@ -48,19 +47,19 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
     }
 
     @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        return columns.get(columnIndex).getKlass();
-    }
-
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return getValueAt(rowIndex, columnIndex) != null && columns.get(columnIndex).isEditable();
+    public int getRowCount() {
+        return rows.size();
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         TRow row = rows.get(rowIndex);
         return columns.get(columnIndex).getValue(row);
+    }
+
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return getValueAt(rowIndex, columnIndex) != null && columns.get(columnIndex).isEditable();
     }
 
     @Override
@@ -88,20 +87,20 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
             this.setter = setter;
         }
 
-        public String getName() {
-            return name;
-        }
-
         public Class<TValue> getKlass() {
             return klass;
         }
 
-        public boolean isEditable() {
-            return setter != null;
+        public String getName() {
+            return name;
         }
 
         public TValue getValue(TRow row) {
             return getter.apply(row);
+        }
+
+        public boolean isEditable() {
+            return setter != null;
         }
 
         public void setValue(TRow row, Object value) {

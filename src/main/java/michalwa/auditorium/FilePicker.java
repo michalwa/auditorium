@@ -1,22 +1,15 @@
 package michalwa.auditorium;
 
+import com.adonax.audiocue.AudioCue;
 import java.awt.Dialog;
 import java.awt.FileDialog;
 import java.io.IOException;
 import java.util.stream.Stream;
-
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-
-import com.adonax.audiocue.AudioCue;
-
 import michalwa.auditorium.playback.SpatialAudio;
 
 class FilePicker {
-    interface AudioFactory {
-        SpatialAudio createAudio(String name, AudioCue[] audioCues);
-    }
-
     public static SpatialAudio loadAudio(AudioFactory factory) {
         FileDialog fileDialog = new FileDialog((Dialog)null, "Open audio clip", FileDialog.LOAD);
         fileDialog.setMultipleMode(true);
@@ -38,5 +31,9 @@ class FilePicker {
         String name = fileDialog.getFiles()[0].getName();
 
         return factory.createAudio(name, audioCues);
+    }
+
+    interface AudioFactory {
+        SpatialAudio createAudio(String name, AudioCue[] audioCues);
     }
 }

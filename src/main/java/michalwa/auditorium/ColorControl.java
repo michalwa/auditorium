@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 
@@ -28,24 +27,17 @@ class ColorControl extends JButton {
         });
     }
 
+    public void addCancelListener(Runnable listener) {
+        cancelListeners.add(listener);
+    }
+
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(30, 10);
     }
 
-    public void setValue(Color value) {
-        Color oldValue = this.value;
-        this.value = value;
-        firePropertyChange("value", oldValue, value);
-        repaint();
-    }
-
     public Color getValue() {
         return value;
-    }
-
-    public void addCancelListener(Runnable listener) {
-        cancelListeners.add(listener);
     }
 
     @Override
@@ -54,5 +46,12 @@ class ColorControl extends JButton {
 
         g.setColor(value);
         g.fillRect(0, 0, getWidth(), getHeight());
+    }
+
+    public void setValue(Color value) {
+        Color oldValue = this.value;
+        this.value = value;
+        firePropertyChange("value", oldValue, value);
+        repaint();
     }
 }

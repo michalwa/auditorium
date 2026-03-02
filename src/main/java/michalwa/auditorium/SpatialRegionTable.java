@@ -1,9 +1,7 @@
 package michalwa.auditorium;
 
 import java.awt.Color;
-
 import javax.swing.JTable;
-
 import michalwa.auditorium.playback.AudioChirp;
 import michalwa.auditorium.playback.SpatialAudio;
 

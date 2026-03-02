@@ -2,7 +2,6 @@ package michalwa.auditorium;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -10,17 +9,12 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
 import michalwa.auditorium.playback.AudioChirp;
 import michalwa.auditorium.playback.AudioLoop;
 import michalwa.auditorium.playback.SpatialAudio;
 
 class App extends JFrame implements Runnable {
     SpatialSlider<SpatialAudio> spatialSlider;
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new App());
-    }
 
     @Override
     public void run() {
@@ -34,15 +28,15 @@ class App extends JFrame implements Runnable {
 
         spatialSlider.addListener(new SpatialSlider.Listener<SpatialAudio>() {
             @Override
-            public void valueChanged(float x, float y) {
-                updateAudio();
-                table.repaint();
-            }
-
-            @Override
             public void regionAdded(SpatialRegion<SpatialAudio> region) {
                 updateAudio();
                 table.addRegion(region);
+            }
+
+            @Override
+            public void valueChanged(float x, float y) {
+                updateAudio();
+                table.repaint();
             }
         });
 
@@ -78,6 +72,10 @@ class App extends JFrame implements Runnable {
 
             region.getData().setVolume(1.0f - squareDist / squareRadius);
         }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new App());
     }
 
     class SliderPopupMenu extends JPopupMenu {
