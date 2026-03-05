@@ -1,4 +1,4 @@
-package michalwa.auditorium.playback.v2;
+package michalwa.auditorium.playback;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -7,7 +7,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
-
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -94,9 +93,9 @@ public class AudioClip implements Serializable {
 
     private static String humanChannels(int channels) {
         return switch (channels) {
-            case 1 -> "mono";
-            case 2 -> "stereo";
-            default -> channels + " channels";
+        case 1 -> "mono";
+        case 2 -> "stereo";
+        default -> channels + " channels";
         };
     }
 }

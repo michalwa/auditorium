@@ -1,4 +1,4 @@
-package michalwa.auditorium.playback.v2;
+package michalwa.auditorium.playback;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -40,6 +40,10 @@ public class AudioPlayer implements Runnable {
      */
     public void addFinishListener(Runnable listener) {
         finishListeners.add(listener);
+    }
+
+    public boolean isPlaying() {
+        return playing;
     }
 
     @Override
@@ -101,10 +105,6 @@ public class AudioPlayer implements Runnable {
         logger.info("Finished " + clip);
 
         for (var listener : finishListeners) listener.run();
-    }
-
-    public boolean isPlaying() {
-        return playing;
     }
 
     public void start() {

@@ -5,8 +5,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.LineUnavailableException;
 import michalwa.auditorium.SpatialRegion;
-import michalwa.auditorium.playback.v2.AudioClip;
-import michalwa.auditorium.playback.v2.AudioPlayer;
 
 /**
  * Abstract base class for an audio clip played from a point in space

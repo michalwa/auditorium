@@ -2,7 +2,6 @@ package michalwa.auditorium.playback;
 
 import javax.swing.Timer;
 import michalwa.auditorium.SpatialRegion;
-import michalwa.auditorium.playback.v2.AudioClip;
 
 /**
  * Plays a random clip from a pool periodically as long as it's in range

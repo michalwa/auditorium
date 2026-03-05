@@ -6,8 +6,8 @@ import java.io.IOException;
 import java.util.stream.Stream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
+import michalwa.auditorium.playback.AudioClip;
 import michalwa.auditorium.playback.SpatialAudio;
-import michalwa.auditorium.playback.v2.AudioClip;
 
 class FilePicker {
     public static SpatialAudio loadAudio(AudioFactory factory) {
