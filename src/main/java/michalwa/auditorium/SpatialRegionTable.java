@@ -1,52 +1,41 @@
 package michalwa.auditorium;
 
 import java.awt.Color;
+import java.util.List;
 import javax.swing.JTable;
 import michalwa.auditorium.playback.AudioChirp;
 import michalwa.auditorium.playback.SpatialAudio;
 
 class SpatialRegionTable extends JTable {
-    private SimpleTableModel<SpatialRegion<SpatialAudio>> model = new SimpleTableModel<>() {
-        {
-            addColumn("Type", String.class, r -> r.getData().getTypeName());
-            addColumn("Color", Color.class, r -> r.color, (r, v) -> r.color = v);
-            addColumn(
-                "Name",
-                String.class,
-                r -> r.getData().getName(),
-                (r, v) -> r.getData().setName(v)
-            );
-            addColumn("X", Float.class, r -> r.centerX, (r, v) -> r.centerX = v);
-            addColumn("Y", Float.class, r -> r.centerY, (r, v) -> r.centerY = v);
-            addColumn("R", Float.class, r -> r.radius, (r, v) -> r.radius = v);
-            addColumn(
-                "Min delay (s)",
-                Float.class,
-                r -> (r.getData() instanceof AudioChirp)
-                    ? ((AudioChirp)r.getData()).minDelaySeconds
-                    : null,
-                (r, v) -> {
-                    if (r.getData() instanceof AudioChirp)
-                        ((AudioChirp)r.getData()).minDelaySeconds = v;
-                }
-            );
-            addColumn(
-                "Max delay (s)",
-                Float.class,
-                r -> (r.getData() instanceof AudioChirp)
-                    ? ((AudioChirp)r.getData()).maxDelaySeconds
-                    : null,
-                (r, v) -> {
-                    if (r.getData() instanceof AudioChirp)
-                        ((AudioChirp)r.getData()).maxDelaySeconds = v;
-                }
-            );
-            addColumn("Volume", Float.class, r -> r.getData().getEffectiveVolume());
-        }
-    };
-
-    SpatialRegionTable() {
-        setModel(model);
+    SpatialRegionTable(List<SpatialRegion<SpatialAudio>> regions) {
+        setModel(new SimpleTableModel<>(regions) {
+            {
+                addColumn("Type", String.class, r -> r.getData().getTypeName());
+                addColumn("Color", Color.class, SpatialRegion::getColor, SpatialRegion::setColor);
+                addColumn(
+                    "Name",
+                    String.class,
+                    SpatialAudio::getRegionName,
+                    SpatialAudio::setRegionName
+                );
+                addColumn("X", Double.class, SpatialRegion::getCenterX, SpatialRegion::setCenterX);
+                addColumn("Y", Double.class, SpatialRegion::getCenterY, SpatialRegion::setCenterY);
+                addColumn("R", Double.class, SpatialRegion::getRadius, SpatialRegion::setRadius);
+                addColumn(
+                    "Min delay (s)",
+                    Double.class,
+                    AudioChirp::getRegionMinDelaySeconds,
+                    AudioChirp::setRegionMinDelaySeconds
+                );
+                addColumn(
+                    "Max delay (s)",
+                    Double.class,
+                    AudioChirp::getRegionMaxDelaySeconds,
+                    AudioChirp::setRegionMaxDelaySeconds
+                );
+                addColumn("Volume", Double.class, r -> r.getData().getEffectiveVolume());
+            }
+        });
 
         ColorCellEditor colorCellEditor = new ColorCellEditor();
 
@@ -54,11 +43,5 @@ class SpatialRegionTable extends JTable {
         setDefaultRenderer(Color.class, colorCellEditor);
 
         getColumnModel().getColumn(2).setPreferredWidth(300);
-    }
-
-    public void addRegion(SpatialRegion<SpatialAudio> region) {
-        model.addRow(region);
-        revalidate();
-        repaint();
     }
 }

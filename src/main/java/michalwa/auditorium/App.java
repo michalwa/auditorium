@@ -2,6 +2,9 @@ package michalwa.auditorium;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -14,82 +17,79 @@ import michalwa.auditorium.playback.AudioLoop;
 import michalwa.auditorium.playback.SpatialAudio;
 
 class App extends JFrame implements Runnable {
-    SpatialSlider<SpatialAudio> spatialSlider;
+    List<SpatialRegion<SpatialAudio>> regions = new ArrayList<>();
+    SpatialSlider slider;
+    SpatialRegionTable table;
+
+    private void addRegion(SpatialRegion<SpatialAudio> region) {
+        regions.add(region);
+        updateAudioLevels();
+        slider.repaint();
+        table.revalidate();
+    }
 
     @Override
     public void run() {
-        setTitle("auditorium");
+        slider = new SpatialSlider(regions, SliderPopupMenu::new);
+        slider.setPreferredSize(new Dimension(400, 400));
+        slider.addPropertyChangeListener("value", e -> updateAudioLevels());
 
-        spatialSlider = new SpatialSlider<SpatialAudio>(SliderPopupMenu::new);
-        spatialSlider.setMinimumSize(new Dimension(400, 400));
-        spatialSlider.setPreferredSize(new Dimension(400, 400));
-
-        SpatialRegionTable table = new SpatialRegionTable();
-
-        spatialSlider.addListener(new SpatialSlider.Listener<SpatialAudio>() {
-            @Override
-            public void regionAdded(SpatialRegion<SpatialAudio> region) {
-                updateAudio();
-                table.addRegion(region);
-            }
-
-            @Override
-            public void valueChanged(float x, float y) {
-                updateAudio();
-                table.repaint();
-            }
-        });
-
+        table = new SpatialRegionTable(regions);
         table.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
                 if (e.getType() == TableModelEvent.UPDATE) {
-                    updateAudio();
-                    spatialSlider.repaint();
+                    updateAudioLevels();
+                    slider.repaint();
                 }
             }
         });
 
-        JScrollPane tableScrollPane = new JScrollPane(table);
+        var tableScrollPane = new JScrollPane(table);
         tableScrollPane.setPreferredSize(new Dimension(400, 100));
 
-        add(spatialSlider, BorderLayout.CENTER);
+        add(slider, BorderLayout.CENTER);
         add(tableScrollPane, BorderLayout.SOUTH);
 
         pack();
 
+        setTitle("auditorium");
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
     }
 
-    private void updateAudio() {
-        for (SpatialRegion<SpatialAudio> region : spatialSlider.getRegions()) {
-            float dx = spatialSlider.getValueX() - region.centerX;
-            float dy = spatialSlider.getValueY() - region.centerY;
-            float squareDist = dx * dx + dy * dy;
-            float squareRadius = region.radius * region.radius;
+    private void updateAudioLevels() {
+        for (SpatialRegion<SpatialAudio> region : regions) {
+            var squareDist = squareDistance(slider.getValue(), region.getCenter());
+            var squareRadius = region.getSquareRadius();
 
-            region.getData().setVolume(1.0f - squareDist / squareRadius);
+            region.getData().setVolume(1.0 - squareDist / squareRadius);
         }
+
+        table.repaint();
     }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new App());
     }
 
+    private static double squareDistance(Point2D a, Point2D b) {
+        var dx = a.getX() - b.getX();
+        var dy = a.getY() - b.getY();
+        return dx * dx + dy * dy;
+    }
+
     class SliderPopupMenu extends JPopupMenu {
-        SliderPopupMenu(float x, float y) {
+        SliderPopupMenu(Point2D value) {
             add(new JMenuItem("Add loop")).addActionListener(e -> {
-                SpatialAudio data = FilePicker.loadAudio(AudioLoop::new);
-                if (data != null)
-                    spatialSlider.addRegion(new SpatialRegion<SpatialAudio>(x, y, 0.4f, data));
+                var data = FilePicker.loadAudio(AudioLoop::new);
+                if (data != null) addRegion(new SpatialRegion<>(value, data));
             });
 
             add(new JMenuItem("Add chirp")).addActionListener(e -> {
-                SpatialAudio data = FilePicker.loadAudio(AudioChirp::new);
-                if (data != null)
-                    spatialSlider.addRegion(new SpatialRegion<SpatialAudio>(x, y, 0.4f, data));
+                var data = FilePicker.loadAudio(AudioChirp::new);
+                if (data != null) addRegion(new SpatialRegion<>(value, data));
             });
         }
     }

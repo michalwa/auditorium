@@ -2,12 +2,13 @@ package michalwa.auditorium.playback;
 
 import com.adonax.audiocue.AudioCue;
 import java.util.stream.Stream;
+import michalwa.auditorium.SpatialRegion;
 
 public abstract class SpatialAudio {
     private String name;
     protected AudioCue[] audioCues;
     protected int[] instanceIds;
-    protected float effectiveVolume = 1.0f;
+    protected double effectiveVolume = 1.0f;
 
     SpatialAudio(String name, AudioCue[] audioCues) {
         this.name = name;
@@ -16,7 +17,7 @@ public abstract class SpatialAudio {
         instanceIds = Stream.of(audioCues).mapToInt(AudioCue::obtainInstance).toArray();
     }
 
-    public float getEffectiveVolume() {
+    public double getEffectiveVolume() {
         return effectiveVolume;
     }
 
@@ -36,12 +37,20 @@ public abstract class SpatialAudio {
         this.name = name;
     }
 
-    public void setVolume(float volume) {
+    public void setVolume(double volume) {
         effectiveVolume = Math.clamp(volume, 0.0f, 1.0f);
 
         for (int i = 0; i < audioCues.length; i++) {
             if (audioCues[i].getIsActive(instanceIds[i]))
                 audioCues[i].setVolume(instanceIds[i], volume);
         }
+    }
+
+    public static String getRegionName(SpatialRegion<? extends SpatialAudio> region) {
+        return region.getData().getName();
+    }
+
+    public static void setRegionName(SpatialRegion<? extends SpatialAudio> region, String name) {
+        region.getData().setName(name);
     }
 }

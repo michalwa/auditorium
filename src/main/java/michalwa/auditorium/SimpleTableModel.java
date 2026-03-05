@@ -8,7 +8,11 @@ import javax.swing.table.AbstractTableModel;
 
 class SimpleTableModel<TRow> extends AbstractTableModel {
     private List<Column<?>> columns = new ArrayList<>();
-    private List<TRow> rows = new ArrayList<>();
+    private List<TRow> rows;
+
+    SimpleTableModel(List<TRow> rows) {
+        this.rows = rows;
+    }
 
     public <TValue> void addColumn(
         String name,

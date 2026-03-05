@@ -5,10 +5,11 @@ import com.adonax.audiocue.AudioCueInstanceEvent;
 import com.adonax.audiocue.AudioCueListener;
 import java.util.Random;
 import javax.swing.Timer;
+import michalwa.auditorium.SpatialRegion;
 
 public class AudioChirp extends SpatialAudio implements AudioCueListener {
     Timer timer = new Timer(0, e -> trigger());
-    public float minDelaySeconds = 1.0f, maxDelaySeconds = 5.0f;
+    public double minDelaySeconds = 1.0, maxDelaySeconds = 5.0;
 
     public AudioChirp(String name, AudioCue[] audioCues) {
         super(name, audioCues);
@@ -42,8 +43,8 @@ public class AudioChirp extends SpatialAudio implements AudioCueListener {
     }
 
     private int randomDelayMillis() {
-        return (int)((minDelaySeconds + (float)Math.random() * (maxDelaySeconds - minDelaySeconds))
-            * 1000.0f);
+        return (int)((minDelaySeconds + Math.random() * (maxDelaySeconds - minDelaySeconds))
+            * 1000.0);
     }
 
     private void restartTimer() {
@@ -55,5 +56,31 @@ public class AudioChirp extends SpatialAudio implements AudioCueListener {
         int i = randomCueIndex();
         audioCues[i].setFramePosition(instanceIds[i], 0.0);
         audioCues[i].start(instanceIds[i]);
+    }
+
+    public static Double getRegionMaxDelaySeconds(SpatialRegion<? super AudioChirp> region) {
+        var data = region.getData();
+        return (data instanceof AudioChirp) ? ((AudioChirp)data).maxDelaySeconds : null;
+    }
+
+    public static Double getRegionMinDelaySeconds(SpatialRegion<? super AudioChirp> region) {
+        var data = region.getData();
+        return (data instanceof AudioChirp) ? ((AudioChirp)data).minDelaySeconds : null;
+    }
+
+    public static void setRegionMaxDelaySeconds(
+        SpatialRegion<? super AudioChirp> region,
+        double value
+    ) {
+        var data = region.getData();
+        if (data instanceof AudioChirp) ((AudioChirp)data).maxDelaySeconds = value;
+    }
+
+    public static void setRegionMinDelaySeconds(
+        SpatialRegion<? super AudioChirp> region,
+        double value
+    ) {
+        var data = region.getData();
+        if (data instanceof AudioChirp) ((AudioChirp)data).minDelaySeconds = value;
     }
 }

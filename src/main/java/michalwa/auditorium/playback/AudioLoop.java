@@ -14,7 +14,7 @@ public class AudioLoop extends SpatialAudio {
     }
 
     @Override
-    public void setVolume(float volume) {
+    public void setVolume(double volume) {
         super.setVolume(volume);
 
         for (int i = 0; i < audioCues.length; i++) {
