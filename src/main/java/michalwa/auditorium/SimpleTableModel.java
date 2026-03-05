@@ -57,7 +57,7 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        TRow row = rows.get(rowIndex);
+        var row = rows.get(rowIndex);
         return columns.get(columnIndex).getValue(row);
     }
 
@@ -68,7 +68,7 @@ class SimpleTableModel<TRow> extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int rowIndex, int columnIndex) {
-        TRow row = rows.get(rowIndex);
+        var row = rows.get(rowIndex);
         columns.get(columnIndex).setValue(row, value);
         fireTableCellUpdated(rowIndex, columnIndex);
     }

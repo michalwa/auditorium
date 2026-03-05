@@ -42,7 +42,7 @@ class SpatialSlider extends JComponent {
         setForeground(Color.LIGHT_GRAY);
         setOpaque(true);
 
-        MouseAdapter mouseAdapter = new MouseAdapter() {
+        var mouseAdapter = new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
                 if (SwingUtilities.isLeftMouseButton(e)) setValue(getNewValue(e));
@@ -103,7 +103,7 @@ class SpatialSlider extends JComponent {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        Graphics2D g2d = (Graphics2D)g;
+        var g2d = (Graphics2D)g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         g2d.setColor(getBackground());
@@ -119,7 +119,7 @@ class SpatialSlider extends JComponent {
 
         g2d.setStroke(new BasicStroke());
 
-        for (int pass = 0; pass < 2; pass++) {
+        for (var pass = 0; pass < 2; pass++) {
             for (SpatialRegion<?> region : regions) {
                 var cx = padding + region.getCenter().getX() * getAreaWidth();
                 var cy = padding + region.getCenter().getY() * getAreaHeight();

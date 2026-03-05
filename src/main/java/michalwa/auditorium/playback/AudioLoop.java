@@ -1,11 +1,13 @@
 package michalwa.auditorium.playback;
 
-import com.adonax.audiocue.AudioCue;
+import michalwa.auditorium.playback.v2.AudioClip;
 
+/**
+ * Plays an audio clip continuously as long as it's in range
+ */
 public class AudioLoop extends SpatialAudio {
-    public AudioLoop(String name, AudioCue[] audioCues) {
-        super(name, audioCues);
-        setLooping(true);
+    public AudioLoop(String name, AudioClip[] clips) {
+        super(name, clips, true);
     }
 
     @Override
@@ -17,12 +19,7 @@ public class AudioLoop extends SpatialAudio {
     public void setVolume(double volume) {
         super.setVolume(volume);
 
-        for (int i = 0; i < audioCues.length; i++) {
-            if (volume > 0.0f) {
-                if (!audioCues[i].getIsPlaying(instanceIds[i])) audioCues[i].start(instanceIds[i]);
-            } else {
-                if (audioCues[i].getIsPlaying(instanceIds[i])) audioCues[i].stop(instanceIds[i]);
-            }
-        }
+        if (getEffectiveVolume() > 0.0) play();
+        else stop();
     }
 }

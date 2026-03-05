@@ -16,7 +16,7 @@ class ColorControl extends JButton {
         this.value = value;
 
         addActionListener(e -> {
-            Color newValue = JColorChooser.showDialog(this, "Pick a color", value);
+            var newValue = JColorChooser.showDialog(this, "Pick a color", value);
             if (newValue != null) {
                 setValue(newValue);
             } else {
@@ -49,7 +49,7 @@ class ColorControl extends JButton {
     }
 
     public void setValue(Color value) {
-        Color oldValue = this.value;
+        var oldValue = this.value;
         this.value = value;
         firePropertyChange("value", oldValue, value);
         repaint();

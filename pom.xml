@@ -48,6 +48,9 @@
         <version>3.6.3</version>
         <configuration>
           <mainClass>michalwa.auditorium.App</mainClass>
+          <arguments>
+            <argument>-enableassertions</argument>
+          </arguments>
         </configuration>
       </plugin>
 
@@ -57,7 +60,12 @@
         <version>3.2.1</version>
         <configuration>
           <java>
-            <cleanthat />
+            <cleanthat>
+              <sourceJdk>${maven.compiler.source}</sourceJdk>
+              <mutators>
+                <mutator>LocalVariableTypeInference</mutator>
+              </mutators>
+            </cleanthat>
             <eclipse>
               <file>${project.basedir}/formatter.xml</file>
               <sortMembersEnabled>true</sortMembersEnabled>
@@ -77,19 +85,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencies>
-    <dependency>
-      <groupId>com.adonax</groupId>
-      <artifactId>audiocue</artifactId>
-      <version>2.1.0</version>
-      <!-- https://github.com/philfrei/AudioCue-maven/commit/11362ad898aad8f07ffc45abda427b721b7b6bec -->
-      <exclusions>
-        <exclusion>
-          <groupId>org.junit.jupiter</groupId>
-          <artifactId>junit-jupiter</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-  </dependencies>
 </project>

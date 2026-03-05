@@ -3,8 +3,10 @@ package michalwa.auditorium;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.LogManager;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -70,7 +72,10 @@ class App extends JFrame implements Runnable {
         table.repaint();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        var logConfig = App.class.getClassLoader().getResourceAsStream("logging.properties");
+        LogManager.getLogManager().readConfiguration(logConfig);
+
         SwingUtilities.invokeLater(new App());
     }
 
