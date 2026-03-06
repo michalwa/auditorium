@@ -7,15 +7,12 @@ import michalwa.auditorium.SpatialRegion;
  * Plays a random clip from a pool periodically as long as it's in range
  */
 public class AudioChirp extends SpatialAudio {
-    private final Timer timer = new Timer(0, e -> play());
+    private transient Timer timer;
     private double minDelaySeconds = 1.0;
     private double maxDelaySeconds = 5.0;
 
     public AudioChirp(String name, AudioClip[] clips) {
         super(name, clips, false);
-
-        timer.setRepeats(false);
-        restartTimer();
     }
 
     @Override
@@ -26,6 +23,15 @@ public class AudioChirp extends SpatialAudio {
     @Override
     public String getTypeName() {
         return "chirp";
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+
+        timer = new Timer(0, e -> play());
+        timer.setRepeats(false);
+        restartTimer();
     }
 
     private int randomDelayMillis() {

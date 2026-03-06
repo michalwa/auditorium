@@ -1,5 +1,6 @@
 package michalwa.auditorium.playback;
 
+import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.LineUnavailableException;
@@ -9,22 +10,21 @@ import michalwa.auditorium.SpatialRegion;
 /**
  * Abstract base class for an audio clip played from a point in space
  */
-public abstract class SpatialAudio {
+public abstract class SpatialAudio implements Serializable {
+    private static final long serialVersionUID = 2026_03_06_001L;
     private static final Logger logger = Logger.getLogger(SpatialAudio.class.getName());
 
     protected final AudioClip[] clips;
     private String name;
     private boolean looping = false;
-    private final Randomizer randomizer;
-    private AudioPlayer player;
-    private VolumeOperator volumeOperator = new VolumeOperator();
+    private transient Randomizer randomizer;
+    private transient AudioPlayer player;
+    private transient VolumeOperator volumeOperator;
 
     SpatialAudio(String name, AudioClip[] clips, boolean looping) {
         this.name = name;
         this.clips = clips;
         this.looping = looping;
-
-        randomizer = new Randomizer(clips.length);
     }
 
     /**
@@ -48,6 +48,16 @@ public abstract class SpatialAudio {
 
     public float getVolume() {
         return volumeOperator.getTargetVolume();
+    }
+
+    /**
+     * Initializes any dynamic logic required to make this object work. This is
+     * separate from the constructor to account for initializing deserialized
+     * objects.
+     */
+    public void initialize() {
+        randomizer = new Randomizer(clips.length);
+        volumeOperator = new VolumeOperator();
     }
 
     /**

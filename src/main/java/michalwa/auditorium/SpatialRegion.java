@@ -2,8 +2,10 @@ package michalwa.auditorium;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.io.Serializable;
 
-public class SpatialRegion<TData> {
+public class SpatialRegion<TData> implements Serializable {
+    private static final long serialVersionUID = 2026_03_06_001L;
     private static final double DEFAULT_RADIUS = 0.4;
 
     private Point2D center;

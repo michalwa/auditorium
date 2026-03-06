@@ -25,6 +25,7 @@ class App extends JFrame implements Runnable {
 
     private void addRegion(SpatialRegion<SpatialAudio> region) {
         regions.add(region);
+        region.getData().initialize();
         updateAudioLevels();
         slider.repaint();
         table.revalidate();
@@ -95,6 +96,19 @@ class App extends JFrame implements Runnable {
             add(new JMenuItem("Add chirp")).addActionListener(e -> {
                 var data = FilePicker.loadAudio(AudioChirp::new);
                 if (data != null) addRegion(new SpatialRegion<>(value, data));
+            });
+
+            add(new JMenuItem("Export"))
+                .addActionListener(e -> { FilePicker.exportData(regions); });
+
+            add(new JMenuItem("Import")).addActionListener(e -> {
+                var data = FilePicker.importData();
+                if (data != null) {
+                    @SuppressWarnings("unchecked")
+                    var importedRegions = (List<SpatialRegion<SpatialAudio>>)regions.getClass()
+                        .cast(data);
+                    for (var region : importedRegions) addRegion(region);
+                }
             });
         }
     }
