@@ -66,7 +66,7 @@ class App extends JFrame implements Runnable {
             var squareDist = squareDistance(slider.getValue(), region.getCenter());
             var squareRadius = region.getSquareRadius();
 
-            region.getData().setVolume(1.0 - squareDist / squareRadius);
+            region.getData().setVolume(1.0f - (float)(squareDist / squareRadius));
         }
 
         table.repaint();

@@ -14,10 +14,10 @@ public class AudioLoop extends SpatialAudio {
     }
 
     @Override
-    public void setVolume(double volume) {
+    public void setVolume(float volume) {
         super.setVolume(volume);
 
-        if (getEffectiveVolume() > 0.0) play();
+        if (volume > 0.0) play();
         else stop();
     }
 }

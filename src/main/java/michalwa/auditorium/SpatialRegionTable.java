@@ -33,7 +33,7 @@ class SpatialRegionTable extends JTable {
                     AudioChirp::getRegionMaxDelaySeconds,
                     AudioChirp::setRegionMaxDelaySeconds
                 );
-                addColumn("Volume", Double.class, r -> r.getData().getEffectiveVolume());
+                addColumn("Volume", Float.class, r -> r.getData().getVolume());
             }
         });
 

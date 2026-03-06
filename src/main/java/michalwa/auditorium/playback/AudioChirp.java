@@ -20,7 +20,7 @@ public class AudioChirp extends SpatialAudio {
 
     @Override
     protected void finished() {
-        if (getEffectiveVolume() > 0.0) restartTimer();
+        if (getVolume() > 0.0) restartTimer();
     }
 
     @Override

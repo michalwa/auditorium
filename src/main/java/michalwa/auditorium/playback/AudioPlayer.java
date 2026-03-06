@@ -24,6 +24,7 @@ public class AudioPlayer implements Runnable {
     private boolean looping;
     private int readFrame = 0;
 
+    private final List<AudioOperator> operators = new ArrayList<>();
     private final List<Runnable> finishListeners = new ArrayList<>();
 
     public AudioPlayer(AudioClip clip, boolean looping) throws LineUnavailableException {
@@ -40,6 +41,13 @@ public class AudioPlayer implements Runnable {
      */
     public void addFinishListener(Runnable listener) {
         finishListeners.add(listener);
+    }
+
+    /**
+     * Appends the given operator to process audio samples before playback
+     */
+    public void addOperator(AudioOperator operator) {
+        operators.add(operator);
     }
 
     public boolean isPlaying() {
@@ -88,9 +96,17 @@ public class AudioPlayer implements Runnable {
                     }
                 }
 
+                for (var operator : operators) operator.nextFrame();
+
                 for (var channel = 0; channel < channels; channel++) {
-                    var sample = readBuffer.getShort(readFrame * frameSize + channel * sampleSize);
-                    writeBuffer.putShort(sample);
+                    var shortSample = readBuffer
+                        .getShort(readFrame * frameSize + channel * sampleSize);
+                    var floatSample = (float)shortSample / (float)Short.MAX_VALUE;
+
+                    for (var operator : operators) floatSample = operator.apply(floatSample);
+
+                    shortSample = (short)(Math.clamp(floatSample, -1.0f, 1.0f) * Short.MAX_VALUE);
+                    writeBuffer.putShort(shortSample);
                 }
 
                 readFrame++;

@@ -14,9 +14,9 @@ public abstract class SpatialAudio {
 
     protected final AudioClip[] clips;
     private String name;
-    private double effectiveVolume = 1.0f;
     private boolean looping = false;
     private AudioPlayer player;
+    private VolumeOperator volumeOperator = new VolumeOperator();
 
     SpatialAudio(String name, AudioClip[] clips, boolean looping) {
         this.name = name;
@@ -28,10 +28,6 @@ public abstract class SpatialAudio {
      * Called when the currently playing clip is finished playing
      */
     protected void finished() {}
-
-    public double getEffectiveVolume() {
-        return effectiveVolume;
-    }
 
     public String getName() {
         return name;
@@ -47,6 +43,10 @@ public abstract class SpatialAudio {
      */
     public abstract String getTypeName();
 
+    public float getVolume() {
+        return volumeOperator.getTargetVolume();
+    }
+
     /**
      * Starts playing a random clip if no clip is already playing
      */
@@ -55,6 +55,7 @@ public abstract class SpatialAudio {
 
         try {
             player = new AudioPlayer(getRandomClip(), looping);
+            player.addOperator(volumeOperator);
             player.addFinishListener(this::finished);
             player.start();
         } catch (LineUnavailableException e) {
@@ -67,12 +68,10 @@ public abstract class SpatialAudio {
     }
 
     /**
-     * Sets the playback volume level of the audio (0..1)
+     * Sets the playback volume level of the audio
      */
-    public void setVolume(double volume) {
-        effectiveVolume = Math.clamp(volume, 0.0, 1.0);
-
-        // TODO: Update gain controls on all clips
+    public void setVolume(float volume) {
+        volumeOperator.setTargetVolume(Math.clamp(volume, 0.0f, 1.0f));
     }
 
     /**
