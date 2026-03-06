@@ -1,9 +1,9 @@
 package michalwa.auditorium.playback;
 
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.LineUnavailableException;
+import michalwa.auditorium.Randomizer;
 import michalwa.auditorium.SpatialRegion;
 
 /**
@@ -15,6 +15,7 @@ public abstract class SpatialAudio {
     protected final AudioClip[] clips;
     private String name;
     private boolean looping = false;
+    private final Randomizer randomizer;
     private AudioPlayer player;
     private VolumeOperator volumeOperator = new VolumeOperator();
 
@@ -22,6 +23,8 @@ public abstract class SpatialAudio {
         this.name = name;
         this.clips = clips;
         this.looping = looping;
+
+        randomizer = new Randomizer(clips.length);
     }
 
     /**
@@ -34,7 +37,7 @@ public abstract class SpatialAudio {
     }
 
     private AudioClip getRandomClip() {
-        return clips[new Random().nextInt(clips.length)];
+        return clips[randomizer.next()];
     }
 
     /**
