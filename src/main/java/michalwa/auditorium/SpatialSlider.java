@@ -31,7 +31,7 @@ class SpatialSlider extends JComponent {
 
     private PopupFactory popupFactory;
 
-    private Point2D value = new Point2D.Double();
+    private Point2D value = new Point2D.Double(0.5, 0.5);
     private List<? extends SpatialRegion<?>> regions;
 
     SpatialSlider(List<? extends SpatialRegion<?>> regions, PopupFactory popupFactory) {

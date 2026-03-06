@@ -128,6 +128,7 @@ public class AudioPlayer implements Runnable {
         playing = true;
 
         thread = new Thread(this);
+        thread.setPriority(Thread.MAX_PRIORITY);
         thread.start();
     }
 
