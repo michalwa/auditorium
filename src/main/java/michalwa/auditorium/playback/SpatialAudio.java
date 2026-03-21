@@ -11,7 +11,7 @@ import michalwa.auditorium.SpatialRegion;
  * Abstract base class for an audio clip played from a point in space
  */
 public abstract class SpatialAudio implements Serializable {
-    private static final long serialVersionUID = 2026_03_06_001L;
+    private static final long serialVersionUID = 2026_03_22_001L;
     private static final Logger logger = Logger.getLogger(SpatialAudio.class.getName());
 
     protected final AudioClip[] clips;
@@ -20,7 +20,8 @@ public abstract class SpatialAudio implements Serializable {
     private boolean killed = false;
     private transient Randomizer randomizer;
     private transient AudioPlayer player;
-    private transient VolumeOperator volumeOperator;
+    private float baseVolume = 1.0f;
+    private VolumeOperator volumeOperator;
 
     SpatialAudio(String name, AudioClip[] clips, boolean looping) {
         this.name = name;
@@ -32,6 +33,10 @@ public abstract class SpatialAudio implements Serializable {
      * Called when the currently playing clip is finished playing
      */
     protected void finished() {}
+
+    public float getBaseVolume() {
+        return baseVolume;
+    }
 
     public String getName() {
         return name;
@@ -85,6 +90,10 @@ public abstract class SpatialAudio implements Serializable {
         }
     }
 
+    public void setBaseVolume(float baseVolume) {
+        this.baseVolume = baseVolume;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -93,7 +102,7 @@ public abstract class SpatialAudio implements Serializable {
      * Sets the playback volume level of the audio
      */
     public void setVolume(float volume) {
-        volumeOperator.setTargetVolume(Math.clamp(volume, 0.0f, 1.0f));
+        volumeOperator.setTargetVolume(Math.clamp(baseVolume * volume, 0.0f, 1.0f));
     }
 
     /**
