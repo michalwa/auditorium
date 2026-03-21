@@ -17,6 +17,7 @@ public abstract class SpatialAudio implements Serializable {
     protected final AudioClip[] clips;
     private String name;
     private boolean looping = false;
+    private boolean killed = false;
     private transient Randomizer randomizer;
     private transient AudioPlayer player;
     private transient VolumeOperator volumeOperator;
@@ -61,10 +62,18 @@ public abstract class SpatialAudio implements Serializable {
     }
 
     /**
+     * Stops the currently playing clip and prevents any future playback
+     */
+    public void kill() {
+        killed = true;
+        stop();
+    }
+
+    /**
      * Starts playing a random clip if no clip is already playing
      */
     protected void play() {
-        if (player != null && player.isPlaying()) return;
+        if (killed || player != null && player.isPlaying()) return;
 
         try {
             player = new AudioPlayer(getRandomClip(), looping);

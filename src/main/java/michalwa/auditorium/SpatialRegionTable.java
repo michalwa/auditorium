@@ -1,13 +1,16 @@
 package michalwa.auditorium;
 
 import java.awt.Color;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import michalwa.auditorium.playback.AudioChirp;
 import michalwa.auditorium.playback.SpatialAudio;
 
 class SpatialRegionTable extends JTable {
-    SpatialRegionTable(List<SpatialRegion<SpatialAudio>> regions) {
+    SpatialRegionTable(List<SpatialRegion<SpatialAudio>> regions, PopupFactory popupFactory) {
         setModel(new SimpleTableModel<>(regions) {
             {
                 addColumn("Type", String.class, r -> r.getData().getTypeName());
@@ -43,5 +46,20 @@ class SpatialRegionTable extends JTable {
         setDefaultRenderer(Color.class, colorCellEditor);
 
         getColumnModel().getColumn(2).setPreferredWidth(300);
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    var rowIndex = rowAtPoint(e.getPoint());
+                    popupFactory.createPopup(rowIndex)
+                        .show(SpatialRegionTable.this, e.getX(), e.getY());
+                }
+            }
+        });
+    }
+
+    interface PopupFactory {
+        JPopupMenu createPopup(int rowIndex);
     }
 }

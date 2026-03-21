@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -14,6 +15,8 @@ import michalwa.auditorium.playback.AudioClip;
 import michalwa.auditorium.playback.SpatialAudio;
 
 class FilePicker {
+    private static final Logger logger = Logger.getLogger(FilePicker.class.getName());
+
     public static void exportData(Object data) {
         var fileDialog = new FileDialog((Dialog)null, "Export project", FileDialog.SAVE);
         fileDialog.setVisible(true);
@@ -24,6 +27,7 @@ class FilePicker {
 
         try (var oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(data);
+            logger.info("Exported " + file.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -39,7 +43,9 @@ class FilePicker {
         var file = fileDialog.getFiles()[0];
 
         try (var ois = new ObjectInputStream(new FileInputStream(file))) {
-            return ois.readObject();
+            var data = ois.readObject();
+            logger.info("Imported " + file.getAbsolutePath());
+            return data;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return null;
