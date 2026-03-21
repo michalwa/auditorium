@@ -28,6 +28,8 @@
           <archive>
             <manifest>
               <mainClass>michalwa.auditorium.App</mainClass>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
             </manifest>
           </archive>
         </configuration>

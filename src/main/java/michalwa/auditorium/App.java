@@ -71,7 +71,7 @@ class App extends JFrame implements Runnable {
 
         pack();
 
-        setTitle("auditorium");
+        setTitle("auditorium " + getClass().getPackage().getImplementationVersion());
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
