@@ -11,17 +11,17 @@ import michalwa.auditorium.SpatialRegion;
  * Abstract base class for an audio clip played from a point in space
  */
 public abstract class SpatialAudio implements Serializable {
-    private static final long serialVersionUID = 2026_03_22_001L;
+    private static final long serialVersionUID = 2026_03_22_002L;
     private static final Logger logger = Logger.getLogger(SpatialAudio.class.getName());
 
     protected final AudioClip[] clips;
     private String name;
     private boolean looping = false;
     private boolean killed = false;
+    private float baseVolume = 1.0f;
     private transient Randomizer randomizer;
     private transient AudioPlayer player;
-    private float baseVolume = 1.0f;
-    private VolumeOperator volumeOperator;
+    private transient VolumeOperator volumeOperator;
 
     SpatialAudio(String name, AudioClip[] clips, boolean looping) {
         this.name = name;
