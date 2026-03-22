@@ -19,7 +19,7 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Package JAR file
-        run: mvn package
+        run: mvn -B package
       - uses: softprops/action-gh-release@v2
         with:
           files: target/auditorium-*-jar-with-dependencies.jar

@@ -13,4 +13,4 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Verify
-        run: mvn verify
+        run: mvn -B verify
