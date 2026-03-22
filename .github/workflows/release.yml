@@ -18,6 +18,8 @@ jobs:
           java-version: 21
           distribution: temurin
           cache: maven
+      - name: Check version
+        run: test "v$(mvn -B help:evaluate -Dexpression=project.version -q -DforceStdout)" == "${{ github.ref_name }}"
       - name: Package JAR file
         run: mvn -B package
       - uses: softprops/action-gh-release@v2
