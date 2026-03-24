@@ -77,6 +77,18 @@ class App extends JFrame implements Runnable {
         setVisible(true);
     }
 
+    private void swapRegions(int i, int j) {
+        if (i < 0 || j < 0) return;
+
+        var temp = regions.get(i);
+        regions.set(i, regions.get(j));
+        regions.set(j, temp);
+
+        slider.repaint();
+        table.revalidate();
+        table.repaint();
+    }
+
     private void updateAudioLevels() {
         for (SpatialRegion<SpatialAudio> region : regions) {
             var squareDist = squareDistance(slider.getValue(), region.getCenter());
@@ -155,6 +167,15 @@ class App extends JFrame implements Runnable {
 
     class TablePopupMenu extends JPopupMenu {
         TablePopupMenu(int rowIndex) {
+            add(new JMenuItem("Move up"))
+                .addActionListener(e -> { swapRegions(rowIndex, rowIndex - 1); });
+            add(new JMenuItem("Move down"))
+                .addActionListener(e -> { swapRegions(rowIndex, rowIndex + 1); });
+            add(new JMenuItem("Move to top")).addActionListener(e -> { swapRegions(rowIndex, 0); });
+            add(new JMenuItem("Move to bottom")).addActionListener(e -> {
+                swapRegions(rowIndex, regions.size() - 1);
+            });
+
             add(new JMenuItem("Delete")).addActionListener(e -> { removeRegion(rowIndex); });
 
             add(new JMenuItem("Delete all")).addActionListener(e -> {
@@ -166,7 +187,7 @@ class App extends JFrame implements Runnable {
                     JOptionPane.YES_NO_OPTION
                 );
 
-                if (choice == 0) clearRegions();
+                if (choice == JOptionPane.YES_OPTION) clearRegions();
             });
         }
     }
