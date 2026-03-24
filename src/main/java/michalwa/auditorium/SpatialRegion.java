@@ -8,6 +8,7 @@ public class SpatialRegion<TData> implements Serializable {
     private static final long serialVersionUID = 2026_03_06_001L;
     private static final double DEFAULT_RADIUS = 0.4;
 
+    private boolean visible = true;
     private Point2D center;
     private double radius;
     private Color color = Color.GREEN;
@@ -51,6 +52,10 @@ public class SpatialRegion<TData> implements Serializable {
         return radius * radius;
     }
 
+    public boolean isVisible() {
+        return visible;
+    }
+
     public void setCenterX(double x) {
         center.setLocation(x, center.getY());
     }
@@ -65,5 +70,9 @@ public class SpatialRegion<TData> implements Serializable {
 
     public void setRadius(double radius) {
         this.radius = radius;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 }

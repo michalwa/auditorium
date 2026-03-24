@@ -121,6 +121,8 @@ class SpatialSlider extends JComponent {
 
         for (var pass = 0; pass < 2; pass++) {
             for (SpatialRegion<?> region : regions) {
+                if (!region.isVisible()) continue;
+
                 var cx = padding + region.getCenter().getX() * getAreaWidth();
                 var cy = padding + region.getCenter().getY() * getAreaHeight();
                 var r = region.getRadius() * Math.min(getAreaWidth(), getAreaHeight());

@@ -77,6 +77,14 @@ class App extends JFrame implements Runnable {
         setVisible(true);
     }
 
+    private void setAllRegionsVisible(boolean visible) {
+        for (var region : regions) region.setVisible(visible);
+
+        slider.repaint();
+        table.revalidate();
+        table.repaint();
+    }
+
     private void swapRegions(int i, int j) {
         if (i < 0 || j < 0) return;
 
@@ -175,6 +183,9 @@ class App extends JFrame implements Runnable {
             add(new JMenuItem("Move to bottom")).addActionListener(e -> {
                 swapRegions(rowIndex, regions.size() - 1);
             });
+
+            add(new JMenuItem("Show all")).addActionListener(e -> setAllRegionsVisible(true));
+            add(new JMenuItem("Hide all")).addActionListener(e -> setAllRegionsVisible(false));
 
             add(new JMenuItem("Delete")).addActionListener(e -> { removeRegion(rowIndex); });
 

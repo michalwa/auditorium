@@ -13,6 +13,7 @@ class SpatialRegionTable extends JTable {
     SpatialRegionTable(List<SpatialRegion<SpatialAudio>> regions, PopupFactory popupFactory) {
         setModel(new SimpleTableModel<>(regions) {
             {
+                addColumn("👁", Boolean.class, SpatialRegion::isVisible, SpatialRegion::setVisible);
                 addColumn("Type", String.class, r -> r.getData().getTypeName());
                 addColumn("Color", Color.class, SpatialRegion::getColor, SpatialRegion::setColor);
                 addColumn(
@@ -50,6 +51,9 @@ class SpatialRegionTable extends JTable {
 
         setDefaultEditor(Color.class, colorCellEditor);
         setDefaultRenderer(Color.class, colorCellEditor);
+
+        getColumnModel().getColumn(0).setPreferredWidth(24);
+        getColumnModel().getColumn(0).setResizable(false);
 
         getColumnModel().getColumn(2).setPreferredWidth(300);
 
