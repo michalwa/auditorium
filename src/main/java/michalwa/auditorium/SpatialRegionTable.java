@@ -3,6 +3,7 @@ package michalwa.auditorium;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.util.List;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -10,6 +11,11 @@ import michalwa.auditorium.playback.AudioChirp;
 import michalwa.auditorium.playback.SpatialAudio;
 
 class SpatialRegionTable extends JTable {
+    /**
+     * Amount to change values by when scrolling over selected numeric cells
+     */
+    private static final double NUMBER_SCROLL_STEP = 0.02f;
+
     SpatialRegionTable(List<SpatialRegion<SpatialAudio>> regions, PopupFactory popupFactory) {
         setModel(new SimpleTableModel<>(regions) {
             {
@@ -60,7 +66,7 @@ class SpatialRegionTable extends JTable {
 
         getColumnModel().getColumn(3).setPreferredWidth(300);
 
-        addMouseListener(new MouseAdapter() {
+        var mouseAdapter = new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger()) {
@@ -69,7 +75,39 @@ class SpatialRegionTable extends JTable {
                         .show(SpatialRegionTable.this, e.getX(), e.getY());
                 }
             }
-        });
+
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                var rowIndex = rowAtPoint(e.getPoint());
+                var columnIndex = columnAtPoint(e.getPoint());
+
+                var isCellSelected = rowIndex == getSelectedRow()
+                    && columnIndex == getSelectedColumn();
+                var isCellEditable = getModel().isCellEditable(rowIndex, columnIndex);
+
+                if (isCellSelected && isCellEditable) {
+                    var columnClass = getModel().getColumnClass(columnIndex);
+                    var currentValue = (Number)getModel().getValueAt(rowIndex, columnIndex);
+
+                    var newValue = currentValue.doubleValue()
+                        - e.getPreciseWheelRotation() * NUMBER_SCROLL_STEP;
+
+                    if (columnClass == Double.class) {
+                        getModel().setValueAt(Double.valueOf(newValue), rowIndex, columnIndex);
+                        return;
+                    } else if (columnClass == Float.class) {
+                        getModel()
+                            .setValueAt(Float.valueOf((float)newValue), rowIndex, columnIndex);
+                        return;
+                    }
+                }
+
+                getParent().dispatchEvent(e);
+            }
+        };
+
+        addMouseListener(mouseAdapter);
+        addMouseWheelListener(mouseAdapter);
     }
 
     interface PopupFactory {
