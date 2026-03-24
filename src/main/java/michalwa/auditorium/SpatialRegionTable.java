@@ -14,8 +14,8 @@ class SpatialRegionTable extends JTable {
         setModel(new SimpleTableModel<>(regions) {
             {
                 addColumn("👁", Boolean.class, SpatialRegion::isVisible, SpatialRegion::setVisible);
+                addColumn("🎨", Color.class, SpatialRegion::getColor, SpatialRegion::setColor);
                 addColumn("Type", String.class, r -> r.getData().getTypeName());
-                addColumn("Color", Color.class, SpatialRegion::getColor, SpatialRegion::setColor);
                 addColumn(
                     "Name",
                     String.class,
@@ -55,7 +55,10 @@ class SpatialRegionTable extends JTable {
         getColumnModel().getColumn(0).setPreferredWidth(24);
         getColumnModel().getColumn(0).setResizable(false);
 
-        getColumnModel().getColumn(2).setPreferredWidth(300);
+        getColumnModel().getColumn(1).setPreferredWidth(24);
+        getColumnModel().getColumn(1).setResizable(false);
+
+        getColumnModel().getColumn(3).setPreferredWidth(300);
 
         addMouseListener(new MouseAdapter() {
             @Override
