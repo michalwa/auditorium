@@ -39,6 +39,16 @@ class App extends JFrame implements Runnable {
         table.revalidate();
     }
 
+    private void moveRegion(int i, int j) {
+        if (i < 0 || j < 0 || i >= regions.size() || j >= regions.size()) return;
+
+        regions.add(j, regions.remove(i));
+
+        slider.repaint();
+        table.revalidate();
+        table.repaint();
+    }
+
     private void removeRegion(int index) {
         regions.get(index).getData().kill();
         regions.remove(index);
@@ -79,18 +89,6 @@ class App extends JFrame implements Runnable {
 
     private void setAllRegionsVisible(boolean visible) {
         for (var region : regions) region.setVisible(visible);
-
-        slider.repaint();
-        table.revalidate();
-        table.repaint();
-    }
-
-    private void swapRegions(int i, int j) {
-        if (i < 0 || j < 0) return;
-
-        var temp = regions.get(i);
-        regions.set(i, regions.get(j));
-        regions.set(j, temp);
 
         slider.repaint();
         table.revalidate();
@@ -176,12 +174,12 @@ class App extends JFrame implements Runnable {
     class TablePopupMenu extends JPopupMenu {
         TablePopupMenu(int rowIndex) {
             add(new JMenuItem("Move up"))
-                .addActionListener(e -> { swapRegions(rowIndex, rowIndex - 1); });
+                .addActionListener(e -> { moveRegion(rowIndex, rowIndex - 1); });
             add(new JMenuItem("Move down"))
-                .addActionListener(e -> { swapRegions(rowIndex, rowIndex + 1); });
-            add(new JMenuItem("Move to top")).addActionListener(e -> { swapRegions(rowIndex, 0); });
+                .addActionListener(e -> { moveRegion(rowIndex, rowIndex + 1); });
+            add(new JMenuItem("Move to top")).addActionListener(e -> { moveRegion(rowIndex, 0); });
             add(new JMenuItem("Move to bottom")).addActionListener(e -> {
-                swapRegions(rowIndex, regions.size() - 1);
+                moveRegion(rowIndex, regions.size() - 1);
             });
 
             add(new JMenuItem("Show all")).addActionListener(e -> setAllRegionsVisible(true));
