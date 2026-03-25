@@ -14,6 +14,7 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 
 class SpatialSlider extends JComponent {
     private static final Stroke DASH_STROKE = new BasicStroke(
@@ -24,15 +25,31 @@ class SpatialSlider extends JComponent {
         new float[] { 4.0f, 8.0f },
         0.0f
     );
+    private static final Stroke DOT_STROKE = new BasicStroke(
+        1.0f,
+        BasicStroke.CAP_SQUARE,
+        BasicStroke.JOIN_MITER,
+        1.0f,
+        new float[] { 1.0f, 3.0f },
+        0.0f
+    );
 
     private int padding = 20;
     private int roundSize = 6;
     private int handleRadius = 4;
+    private boolean dynamicVisualizationEnabled = true;
+    private boolean showAllGizmosEnabled = false;
+    private boolean showGuidesEnabled = false;
+    private boolean smoothingEnabled = true;
+    private double smoothingSpeed = 0.2;
 
     private PopupFactory popupFactory;
 
     private Point2D value = new Point2D.Double(0.5, 0.5);
+    private Point2D targetValue = new Point2D.Double(0.5, 0.5);
     private List<? extends SpatialRegion<?>> regions;
+
+    private final Timer updateTimer;
 
     SpatialSlider(List<? extends SpatialRegion<?>> regions, PopupFactory popupFactory) {
         this.regions = regions;
@@ -45,13 +62,13 @@ class SpatialSlider extends JComponent {
         var mouseAdapter = new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) setValue(getNewValue(e));
+                if (SwingUtilities.isLeftMouseButton(e)) setTargetValue(getNewValue(e));
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger()) showContextMenu(e);
-                if (SwingUtilities.isLeftMouseButton(e)) setValue(getNewValue(e));
+                if (SwingUtilities.isLeftMouseButton(e)) setTargetValue(getNewValue(e));
             }
 
             @Override
@@ -62,6 +79,9 @@ class SpatialSlider extends JComponent {
 
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
+
+        updateTimer = new Timer(15, e -> update());
+        updateTimer.start();
     }
 
     private void drawHorizontalLine(Graphics g, int x, int y, int width) {
@@ -95,8 +115,28 @@ class SpatialSlider extends JComponent {
         );
     }
 
+    public double getSmoothingSpeed() {
+        return smoothingSpeed;
+    }
+
     public Point2D getValue() {
         return value;
+    }
+
+    public boolean isDynamicVisualizationEnabled() {
+        return dynamicVisualizationEnabled;
+    }
+
+    public boolean isShowAllGizmosEnabled() {
+        return showAllGizmosEnabled;
+    }
+
+    public boolean isShowGuidesEnabled() {
+        return showGuidesEnabled;
+    }
+
+    public boolean isSmoothingEnabled() {
+        return smoothingEnabled;
     }
 
     @Override
@@ -114,37 +154,50 @@ class SpatialSlider extends JComponent {
         g2d.setColor(getForeground());
         g2d.setStroke(DASH_STROKE);
 
-        drawVerticalLine(g, padding + getAreaWidth() / 2, padding, getAreaHeight());
-        drawHorizontalLine(g, padding, padding + getAreaHeight() / 2, getAreaWidth());
+        if (showGuidesEnabled) {
+            drawVerticalLine(g, padding + getAreaWidth() / 2, padding, getAreaHeight());
+            drawHorizontalLine(g, padding, padding + getAreaHeight() / 2, getAreaWidth());
+        }
 
         g2d.setStroke(new BasicStroke());
 
-        for (var pass = 0; pass < 2; pass++) {
-            for (SpatialRegion<?> region : regions) {
-                if (!region.isVisible()) continue;
+        for (SpatialRegion<?> region : regions) {
+            if (!region.isVisible()) continue;
 
-                var cx = padding + region.getCenter().getX() * getAreaWidth();
-                var cy = padding + region.getCenter().getY() * getAreaHeight();
-                var r = region.getRadius() * Math.min(getAreaWidth(), getAreaHeight());
+            var cx = padding + region.getCenter().getX() * getAreaWidth();
+            var cy = padding + region.getCenter().getY() * getAreaHeight();
+            var r = region.getRadius() * Math.min(getAreaWidth(), getAreaHeight());
 
-                if (pass == 0) {
-                    g2d.setColor(region.getColor());
-                    g2d.drawOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
-                } else if (pass == 1) {
-                    g2d.setPaint(
-                        new RadialGradientPaint(
-                            (float)cx,
-                            (float)cy,
-                            (float)r,
-                            new float[] { 0.0f, 1.0f },
-                            new Color[] { region.getColor(), new Color(0, 0, 0, 0) }
-                        )
-                    );
-                    g2d.fillOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
-                }
+            var intensity = dynamicVisualizationEnabled
+                ? region.getData().getDynamicIntensity()
+                : region.getData().getStaticIntensity();
+            var middleColorStop = 1.0001f - 1.0f / Math.max(intensity, 1.0f);
+            var startColor = withAlpha(region.getColor(), (int)(Math.min(intensity, 1.0f) * 200));
+            var endColor = withAlpha(region.getColor(), 0);
+
+            g2d.setPaint(
+                new RadialGradientPaint(
+                    (float)cx,
+                    (float)cy,
+                    (float)r,
+                    new float[] { 0.0f, middleColorStop, 1.0f },
+                    new Color[] { startColor, startColor, endColor }
+                )
+            );
+            g2d.fillOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
+
+            if (showAllGizmosEnabled || region.isSelected()) {
+                g2d.setColor(region.getColor());
+                g2d.setStroke(new BasicStroke());
+                g2d.drawLine((int)cx - 5, (int)cy, (int)cx + 5, (int)cy);
+                g2d.drawLine((int)cx, (int)cy - 5, (int)cx, (int)cy + 5);
+
+                g2d.setStroke(DOT_STROKE);
+                g2d.drawOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
             }
         }
 
+        g2d.setStroke(new BasicStroke());
         g2d.setClip(null);
 
         g2d.setColor(getForeground());
@@ -159,16 +212,56 @@ class SpatialSlider extends JComponent {
         g2d.drawRoundRect(padding, padding, getAreaWidth(), getAreaHeight(), roundSize, roundSize);
     }
 
-    public void setValue(Point2D value) {
-        var oldValue = this.value;
-        this.value = value;
+    public void setDynamicVisualizationEnabled(boolean enabled) {
+        dynamicVisualizationEnabled = enabled;
+    }
 
-        firePropertyChange("value", oldValue, value);
-        repaint();
+    public void setShowAllGizmosEnabled(boolean enabled) {
+        showAllGizmosEnabled = enabled;
+    }
+
+    public void setShowGuidesEnabled(boolean enabled) {
+        showGuidesEnabled = enabled;
+    }
+
+    public void setSmoothingEnabled(boolean enabled) {
+        this.smoothingEnabled = enabled;
+    }
+
+    public void setSmoothingSpeed(double speed) {
+        smoothingSpeed = speed;
+    }
+
+    public void setTargetValue(Point2D targetValue) {
+        this.targetValue = targetValue;
+
+        if (!smoothingEnabled) {
+            var oldValue = value;
+            value = targetValue;
+            firePropertyChange("value", oldValue, value);
+        }
     }
 
     private void showContextMenu(MouseEvent e) {
         popupFactory.createPopup(getNewValue(e)).show(e.getComponent(), e.getX(), e.getY());
+    }
+
+    private void update() {
+        if (smoothingEnabled) {
+            var oldValue = value;
+            value = new Point2D.Double(
+                value.getX() + (targetValue.getX() - value.getX()) * smoothingSpeed,
+                value.getY() + (targetValue.getY() - value.getY()) * smoothingSpeed
+            );
+
+            firePropertyChange("value", oldValue, value);
+        }
+
+        repaint();
+    }
+
+    private Color withAlpha(Color c, int alpha) {
+        return new Color(c.getRed(), c.getGreen(), c.getBlue(), Math.clamp(alpha, 0, 255));
     }
 
     interface PopupFactory {

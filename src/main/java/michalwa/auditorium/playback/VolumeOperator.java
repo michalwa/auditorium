@@ -31,7 +31,7 @@ public class VolumeOperator implements AudioOperator {
     }
 
     @Override
-    public void nextFrame() {
+    public void nextFrame(int channels) {
         var diff = targetVolume - volume;
         volume += Math.signum(diff) * Math.min(maxVolumeStep, Math.abs(diff));
     }

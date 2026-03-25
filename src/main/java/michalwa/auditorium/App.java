@@ -8,13 +8,19 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.LogManager;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import michalwa.auditorium.playback.AudioChirp;
@@ -22,22 +28,28 @@ import michalwa.auditorium.playback.AudioLoop;
 import michalwa.auditorium.playback.SpatialAudio;
 
 class App extends JFrame implements Runnable {
+    private static final SmoothingPreset[] SMOOTHING_PRESETS = new SmoothingPreset[] {
+        new SmoothingPreset("Subtle", 0.3),
+        new SmoothingPreset("Moderate", 0.2),
+        new SmoothingPreset("Heavy", 0.1),
+        new SmoothingPreset("Sluggish", 0.02) };
+
     List<SpatialRegion<SpatialAudio>> regions = new ArrayList<>();
     SpatialSlider slider;
     SpatialRegionTable table;
+
+    record SmoothingPreset(String name, double speed) {}
 
     private void addRegion(SpatialRegion<SpatialAudio> region) {
         regions.add(region);
         region.getData().initialize();
         updateAudioLevels();
-        slider.repaint();
         table.revalidate();
     }
 
     private void clearRegions() {
         for (var region : regions) region.getData().kill();
         regions.clear();
-        slider.repaint();
         table.revalidate();
     }
 
@@ -46,7 +58,6 @@ class App extends JFrame implements Runnable {
 
         regions.add(j, regions.remove(i));
 
-        slider.repaint();
         table.revalidate();
         table.repaint();
     }
@@ -54,7 +65,6 @@ class App extends JFrame implements Runnable {
     private void removeRegion(int index) {
         regions.get(index).getData().kill();
         regions.remove(index);
-        slider.repaint();
         table.revalidate();
     }
 
@@ -68,15 +78,21 @@ class App extends JFrame implements Runnable {
         table.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.UPDATE) {
-                    updateAudioLevels();
-                    slider.repaint();
+                if (e.getType() == TableModelEvent.UPDATE) updateAudioLevels();
+            }
+        });
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                for (var i = e.getFirstIndex(); i <= e.getLastIndex(); i++) {
+                    regions.get(i).setSelected(table.isRowSelected(i));
                 }
             }
         });
 
         var tableScrollPane = new JScrollPane(table);
         tableScrollPane.setPreferredSize(new Dimension(400, 100));
+        tableScrollPane.setComponentPopupMenu(new TablePopupMenu(-1));
 
         add(slider, BorderLayout.CENTER);
         add(tableScrollPane, BorderLayout.SOUTH);
@@ -109,7 +125,6 @@ class App extends JFrame implements Runnable {
     private void setAllRegionsVisible(boolean visible) {
         for (var region : regions) region.setVisible(visible);
 
-        slider.repaint();
         table.revalidate();
         table.repaint();
     }
@@ -187,24 +202,67 @@ class App extends JFrame implements Runnable {
                     );
                 }
             });
+
+            addCheckbox(
+                "Show all gizmos",
+                slider.isShowAllGizmosEnabled(),
+                slider::setShowAllGizmosEnabled
+            );
+            addCheckbox("Show guides", slider.isShowGuidesEnabled(), slider::setShowGuidesEnabled);
+            addCheckbox(
+                "Dynamic visualization",
+                slider.isDynamicVisualizationEnabled(),
+                slider::setDynamicVisualizationEnabled
+            );
+
+            var smoothingMenu = new JMenu("Smoothing");
+            smoothingMenu.add(new JRadioButtonMenuItem("None", !slider.isSmoothingEnabled()))
+                .addActionListener(e -> slider.setSmoothingEnabled(false));
+
+            for (var preset : SMOOTHING_PRESETS) {
+                smoothingMenu
+                    .add(
+                        new JRadioButtonMenuItem(
+                            preset.name,
+                            slider.isSmoothingEnabled()
+                                && slider.getSmoothingSpeed() == preset.speed
+                        )
+                    )
+                    .addActionListener(e -> {
+                        slider.setSmoothingEnabled(true);
+                        slider.setSmoothingSpeed(preset.speed);
+                    });
+            }
+
+            add(smoothingMenu);
+        }
+
+        private void addCheckbox(String text, boolean state, Consumer<Boolean> setter) {
+            add(new JCheckBoxMenuItem(text, state)).addActionListener(e -> setter.accept(!state));
         }
     }
 
     class TablePopupMenu extends JPopupMenu {
         TablePopupMenu(int rowIndex) {
-            add(new JMenuItem("Move up"))
-                .addActionListener(e -> { moveRegion(rowIndex, rowIndex - 1); });
-            add(new JMenuItem("Move down"))
-                .addActionListener(e -> { moveRegion(rowIndex, rowIndex + 1); });
-            add(new JMenuItem("Move to top")).addActionListener(e -> { moveRegion(rowIndex, 0); });
-            add(new JMenuItem("Move to bottom")).addActionListener(e -> {
-                moveRegion(rowIndex, regions.size() - 1);
-            });
+            if (rowIndex >= 0) {
+                add(new JMenuItem("Move up"))
+                    .addActionListener(e -> { moveRegion(rowIndex, rowIndex - 1); });
+                add(new JMenuItem("Move down"))
+                    .addActionListener(e -> { moveRegion(rowIndex, rowIndex + 1); });
+                add(new JMenuItem("Move to top"))
+                    .addActionListener(e -> { moveRegion(rowIndex, 0); });
+                add(new JMenuItem("Move to bottom")).addActionListener(e -> {
+                    moveRegion(rowIndex, regions.size() - 1);
+                });
+            }
 
             add(new JMenuItem("Show all")).addActionListener(e -> setAllRegionsVisible(true));
             add(new JMenuItem("Hide all")).addActionListener(e -> setAllRegionsVisible(false));
+            add(new JMenuItem("Clear selection")).addActionListener(e -> table.clearSelection());
 
-            add(new JMenuItem("Delete")).addActionListener(e -> { removeRegion(rowIndex); });
+            if (rowIndex >= 0) {
+                add(new JMenuItem("Delete")).addActionListener(e -> { removeRegion(rowIndex); });
+            }
 
             add(new JMenuItem("Delete all")).addActionListener(e -> {
                 var title = ((JMenuItem)e.getSource()).getText();

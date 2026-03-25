@@ -10,7 +10,7 @@ import michalwa.auditorium.SpatialRegion;
 /**
  * Abstract base class for an audio clip played from a point in space
  */
-public abstract class SpatialAudio implements Serializable {
+public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
     private static final long serialVersionUID = 2026_03_22_002L;
     private static final Logger logger = Logger.getLogger(SpatialAudio.class.getName());
 
@@ -22,6 +22,7 @@ public abstract class SpatialAudio implements Serializable {
     private transient Randomizer randomizer;
     private transient AudioPlayer player;
     private transient VolumeOperator volumeOperator;
+    private transient LevelReader levelReader;
 
     SpatialAudio(String name, AudioClip[] clips, boolean looping) {
         this.name = name;
@@ -38,12 +39,22 @@ public abstract class SpatialAudio implements Serializable {
         return baseVolume;
     }
 
+    @Override
+    public float getDynamicIntensity() {
+        return baseVolume + 3.0f * levelReader.nextSmoothLevel();
+    }
+
     public String getName() {
         return name;
     }
 
     private AudioClip getRandomClip() {
         return clips[randomizer.next()];
+    }
+
+    @Override
+    public float getStaticIntensity() {
+        return baseVolume;
     }
 
     /**
@@ -64,6 +75,7 @@ public abstract class SpatialAudio implements Serializable {
     public void initialize() {
         randomizer = new Randomizer(clips.length);
         volumeOperator = new VolumeOperator();
+        levelReader = new LevelReader();
     }
 
     /**
@@ -82,6 +94,7 @@ public abstract class SpatialAudio implements Serializable {
 
         try {
             player = new AudioPlayer(getRandomClip(), looping);
+            player.addOperator(levelReader);
             player.addOperator(volumeOperator);
             player.addFinishListener(this::finished);
             player.start();

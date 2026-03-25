@@ -15,9 +15,14 @@ public interface AudioOperator {
     float apply(float sample);
 
     /**
+     * Called when the end of the audio clip is reached
+     */
+    default void finished() {}
+
+    /**
      * Called for each frame before processing samples. Implementations may
      * define update logic which needs to happen periodically, like gradual
      * value changes.
      */
-    void nextFrame();
+    default void nextFrame(int channels) {}
 }
