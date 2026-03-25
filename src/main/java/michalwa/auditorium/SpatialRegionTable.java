@@ -87,25 +87,26 @@ class SpatialRegionTable extends JTable {
                 var isCellSelected = rowIndex == getSelectedRow()
                     && columnIndex == getSelectedColumn();
                 var isCellEditable = getModel().isCellEditable(rowIndex, columnIndex);
+                var columnClass = getModel().getColumnClass(columnIndex);
 
-                if (isCellSelected && isCellEditable) {
-                    var columnClass = getModel().getColumnClass(columnIndex);
+                if (
+                    isCellSelected
+                        && isCellEditable
+                        && (columnClass == Double.class || columnClass == Float.class)
+                ) {
                     var currentValue = (Number)getModel().getValueAt(rowIndex, columnIndex);
-
                     var newValue = currentValue.doubleValue()
                         - e.getPreciseWheelRotation() * NUMBER_SCROLL_STEP;
 
                     if (columnClass == Double.class) {
                         getModel().setValueAt(Double.valueOf(newValue), rowIndex, columnIndex);
-                        return;
                     } else if (columnClass == Float.class) {
                         getModel()
                             .setValueAt(Float.valueOf((float)newValue), rowIndex, columnIndex);
-                        return;
                     }
+                } else {
+                    getParent().dispatchEvent(e);
                 }
-
-                getParent().dispatchEvent(e);
             }
         };
 
