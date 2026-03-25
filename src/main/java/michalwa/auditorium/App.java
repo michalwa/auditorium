@@ -23,9 +23,9 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import michalwa.auditorium.playback.AudioChirp;
-import michalwa.auditorium.playback.AudioLoop;
-import michalwa.auditorium.playback.SpatialAudio;
+import michalwa.auditorium.playback.ChirpEmitter;
+import michalwa.auditorium.playback.Emitter;
+import michalwa.auditorium.playback.LoopEmitter;
 
 class App extends JFrame implements Runnable {
     private static final SmoothingPreset[] SMOOTHING_PRESETS = new SmoothingPreset[] {
@@ -34,13 +34,13 @@ class App extends JFrame implements Runnable {
         new SmoothingPreset("Heavy", 0.1),
         new SmoothingPreset("Sluggish", 0.02) };
 
-    List<SpatialRegion<SpatialAudio>> regions = new ArrayList<>();
-    SpatialSlider slider;
-    SpatialRegionTable table;
+    List<Region2D<Emitter>> regions = new ArrayList<>();
+    Slider2D slider;
+    EmitterTable table;
 
     record SmoothingPreset(String name, double speed) {}
 
-    private void addRegion(SpatialRegion<SpatialAudio> region) {
+    private void addRegion(Region2D<Emitter> region) {
         regions.add(region);
         region.getData().initialize();
         updateAudioLevels();
@@ -70,11 +70,11 @@ class App extends JFrame implements Runnable {
 
     @Override
     public void run() {
-        slider = new SpatialSlider(regions, SliderPopupMenu::new);
+        slider = new Slider2D(regions, SliderPopupMenu::new);
         slider.setPreferredSize(new Dimension(400, 400));
         slider.addPropertyChangeListener("value", e -> updateAudioLevels());
 
-        table = new SpatialRegionTable(regions, TablePopupMenu::new);
+        table = new EmitterTable(regions, TablePopupMenu::new);
         table.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
@@ -130,7 +130,7 @@ class App extends JFrame implements Runnable {
     }
 
     private void updateAudioLevels() {
-        for (SpatialRegion<SpatialAudio> region : regions) {
+        for (Region2D<Emitter> region : regions) {
             var squareDist = squareDistance(slider.getValue(), region.getCenter());
             var squareRadius = region.getSquareRadius();
 
@@ -156,9 +156,9 @@ class App extends JFrame implements Runnable {
     class SliderPopupMenu extends JPopupMenu {
         SliderPopupMenu(Point2D value) {
             add(new JMenuItem("Add loop")).addActionListener(e -> {
-                var data = FilePicker.loadAudio(AudioLoop::new);
+                var data = FileUtils.loadAudio(LoopEmitter::new);
                 if (data != null) {
-                    addRegion(new SpatialRegion<>(value, data));
+                    addRegion(new Region2D<>(value, data));
                 } else {
                     JOptionPane.showMessageDialog(
                         getInvoker(),
@@ -170,9 +170,9 @@ class App extends JFrame implements Runnable {
             });
 
             add(new JMenuItem("Add chirp")).addActionListener(e -> {
-                var data = FilePicker.loadAudio(AudioChirp::new);
+                var data = FileUtils.loadAudio(ChirpEmitter::new);
                 if (data != null) {
-                    addRegion(new SpatialRegion<>(value, data));
+                    addRegion(new Region2D<>(value, data));
                 } else {
                     JOptionPane.showMessageDialog(
                         getInvoker(),
@@ -183,15 +183,13 @@ class App extends JFrame implements Runnable {
                 }
             });
 
-            add(new JMenuItem("Export"))
-                .addActionListener(e -> { FilePicker.exportData(regions); });
+            add(new JMenuItem("Export")).addActionListener(e -> { FileUtils.exportData(regions); });
 
             add(new JMenuItem("Import")).addActionListener(e -> {
-                var data = FilePicker.importData();
+                var data = FileUtils.importData();
                 if (data != null) {
                     @SuppressWarnings("unchecked")
-                    var importedRegions = (List<SpatialRegion<SpatialAudio>>)regions.getClass()
-                        .cast(data);
+                    var importedRegions = (List<Region2D<Emitter>>)regions.getClass().cast(data);
                     for (var region : importedRegions) addRegion(region);
                 } else {
                     JOptionPane.showMessageDialog(

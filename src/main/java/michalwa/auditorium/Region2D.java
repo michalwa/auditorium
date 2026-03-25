@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-public class SpatialRegion<TData extends SpatialRegion.Data> implements Serializable {
+/**
+ * A radial region/circle in 2D space, used with {@link Slider2D}
+ */
+public class Region2D<TData extends Region2D.Data> implements Serializable {
     private static final long serialVersionUID = 2026_03_06_001L;
     private static final double DEFAULT_RADIUS = 0.4;
 
@@ -15,11 +18,11 @@ public class SpatialRegion<TData extends SpatialRegion.Data> implements Serializ
     private Color color = Color.GREEN;
     private TData data;
 
-    SpatialRegion(Point2D center, TData data) {
+    Region2D(Point2D center, TData data) {
         this(center, DEFAULT_RADIUS, data);
     }
 
-    SpatialRegion(Point2D center, double radius, TData data) {
+    Region2D(Point2D center, double radius, TData data) {
         this.center = center;
         this.radius = radius;
         this.data = data;

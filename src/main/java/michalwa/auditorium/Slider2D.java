@@ -16,7 +16,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
-class SpatialSlider extends JComponent {
+/**
+ * A 2D area representing a virtual space, with a movable point and a number of
+ * {@link Region2D} regions
+ */
+class Slider2D extends JComponent {
     private static final Stroke DASH_STROKE = new BasicStroke(
         1.0f,
         BasicStroke.CAP_SQUARE,
@@ -47,11 +51,11 @@ class SpatialSlider extends JComponent {
 
     private Point2D value = new Point2D.Double(0.5, 0.5);
     private Point2D targetValue = new Point2D.Double(0.5, 0.5);
-    private List<? extends SpatialRegion<?>> regions;
+    private List<? extends Region2D<?>> regions;
 
     private final Timer updateTimer;
 
-    SpatialSlider(List<? extends SpatialRegion<?>> regions, PopupFactory popupFactory) {
+    Slider2D(List<? extends Region2D<?>> regions, PopupFactory popupFactory) {
         this.regions = regions;
         this.popupFactory = popupFactory;
 
@@ -161,7 +165,7 @@ class SpatialSlider extends JComponent {
 
         g2d.setStroke(new BasicStroke());
 
-        for (SpatialRegion<?> region : regions) {
+        for (Region2D<?> region : regions) {
             if (!region.isVisible()) continue;
 
             var cx = padding + region.getCenter().getX() * getAreaWidth();

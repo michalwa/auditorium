@@ -5,14 +5,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.LineUnavailableException;
 import michalwa.auditorium.Randomizer;
-import michalwa.auditorium.SpatialRegion;
+import michalwa.auditorium.Region2D;
 
 /**
  * Abstract base class for an audio clip played from a point in space
  */
-public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
+public abstract class Emitter implements Serializable, Region2D.Data {
     private static final long serialVersionUID = 2026_03_22_002L;
-    private static final Logger logger = Logger.getLogger(SpatialAudio.class.getName());
+    private static final Logger logger = Logger.getLogger(Emitter.class.getName());
 
     protected final AudioClip[] clips;
     private String name;
@@ -24,7 +24,7 @@ public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
     private transient VolumeOperator volumeOperator;
     private transient LevelReader levelReader;
 
-    SpatialAudio(String name, AudioClip[] clips, boolean looping) {
+    Emitter(String name, AudioClip[] clips, boolean looping) {
         this.name = name;
         this.clips = clips;
         this.looping = looping;
@@ -58,8 +58,8 @@ public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
     }
 
     /**
-     * @return Human-readable string describing the type of this
-     *         {@link SpatialAudio} object
+     * @return Human-readable string describing the type of this {@link Emitter}
+     *         object
      */
     public abstract String getTypeName();
 
@@ -128,11 +128,11 @@ public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
         player = null;
     }
 
-    public static String getRegionName(SpatialRegion<? extends SpatialAudio> region) {
+    public static String getRegionName(Region2D<? extends Emitter> region) {
         return region.getData().getName();
     }
 
-    public static void setRegionName(SpatialRegion<? extends SpatialAudio> region, String name) {
+    public static void setRegionName(Region2D<? extends Emitter> region, String name) {
         region.getData().setName(name);
     }
 }

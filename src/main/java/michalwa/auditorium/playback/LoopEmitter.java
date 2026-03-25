@@ -3,8 +3,10 @@ package michalwa.auditorium.playback;
 /**
  * Plays an audio clip continuously as long as it's in range
  */
-public class AudioLoop extends SpatialAudio {
-    public AudioLoop(String name, AudioClip[] clips) {
+public class LoopEmitter extends Emitter {
+    private static final long serialVersionUID = 2026_03_26_002L;
+
+    public LoopEmitter(String name, AudioClip[] clips) {
         super(name, clips, true);
     }
 

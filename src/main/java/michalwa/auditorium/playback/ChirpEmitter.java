@@ -1,17 +1,19 @@
 package michalwa.auditorium.playback;
 
 import javax.swing.Timer;
-import michalwa.auditorium.SpatialRegion;
+import michalwa.auditorium.Region2D;
 
 /**
  * Plays a random clip from a pool periodically as long as it's in range
  */
-public class AudioChirp extends SpatialAudio {
+public class ChirpEmitter extends Emitter {
+    private static final long serialVersionUID = 2026_03_26_001L;
+
     private transient Timer timer;
     private double minDelaySeconds = 1.0;
     private double maxDelaySeconds = 5.0;
 
-    public AudioChirp(String name, AudioClip[] clips) {
+    public ChirpEmitter(String name, AudioClip[] clips) {
         super(name, clips, false);
     }
 
@@ -44,29 +46,29 @@ public class AudioChirp extends SpatialAudio {
         timer.start();
     }
 
-    public static Double getRegionMaxDelaySeconds(SpatialRegion<? super AudioChirp> region) {
+    public static Double getRegionMaxDelaySeconds(Region2D<? super ChirpEmitter> region) {
         var data = region.getData();
-        return (data instanceof AudioChirp) ? ((AudioChirp)data).maxDelaySeconds : null;
+        return (data instanceof ChirpEmitter) ? ((ChirpEmitter)data).maxDelaySeconds : null;
     }
 
-    public static Double getRegionMinDelaySeconds(SpatialRegion<? super AudioChirp> region) {
+    public static Double getRegionMinDelaySeconds(Region2D<? super ChirpEmitter> region) {
         var data = region.getData();
-        return (data instanceof AudioChirp) ? ((AudioChirp)data).minDelaySeconds : null;
+        return (data instanceof ChirpEmitter) ? ((ChirpEmitter)data).minDelaySeconds : null;
     }
 
     public static void setRegionMaxDelaySeconds(
-        SpatialRegion<? super AudioChirp> region,
+        Region2D<? super ChirpEmitter> region,
         double value
     ) {
         var data = region.getData();
-        if (data instanceof AudioChirp) ((AudioChirp)data).maxDelaySeconds = value;
+        if (data instanceof ChirpEmitter) ((ChirpEmitter)data).maxDelaySeconds = value;
     }
 
     public static void setRegionMinDelaySeconds(
-        SpatialRegion<? super AudioChirp> region,
+        Region2D<? super ChirpEmitter> region,
         double value
     ) {
         var data = region.getData();
-        if (data instanceof AudioChirp) ((AudioChirp)data).minDelaySeconds = value;
+        if (data instanceof ChirpEmitter) ((ChirpEmitter)data).minDelaySeconds = value;
     }
 }

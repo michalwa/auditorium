@@ -7,41 +7,36 @@ import java.awt.event.MouseWheelEvent;
 import java.util.List;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
-import michalwa.auditorium.playback.AudioChirp;
-import michalwa.auditorium.playback.SpatialAudio;
+import michalwa.auditorium.playback.ChirpEmitter;
+import michalwa.auditorium.playback.Emitter;
 
-class SpatialRegionTable extends JTable {
+class EmitterTable extends JTable {
     /**
      * Amount to change values by when scrolling over selected numeric cells
      */
     private static final double NUMBER_SCROLL_STEP = 0.02f;
 
-    SpatialRegionTable(List<SpatialRegion<SpatialAudio>> regions, PopupFactory popupFactory) {
+    EmitterTable(List<Region2D<Emitter>> regions, PopupFactory popupFactory) {
         setModel(new SimpleTableModel<>(regions) {
             {
-                addColumn("👁", Boolean.class, SpatialRegion::isVisible, SpatialRegion::setVisible);
-                addColumn("🎨", Color.class, SpatialRegion::getColor, SpatialRegion::setColor);
+                addColumn("👁", Boolean.class, Region2D::isVisible, Region2D::setVisible);
+                addColumn("🎨", Color.class, Region2D::getColor, Region2D::setColor);
                 addColumn("Type", String.class, r -> r.getData().getTypeName());
-                addColumn(
-                    "Name",
-                    String.class,
-                    SpatialAudio::getRegionName,
-                    SpatialAudio::setRegionName
-                );
-                addColumn("X", Double.class, SpatialRegion::getCenterX, SpatialRegion::setCenterX);
-                addColumn("Y", Double.class, SpatialRegion::getCenterY, SpatialRegion::setCenterY);
-                addColumn("R", Double.class, SpatialRegion::getRadius, SpatialRegion::setRadius);
+                addColumn("Name", String.class, Emitter::getRegionName, Emitter::setRegionName);
+                addColumn("X", Double.class, Region2D::getCenterX, Region2D::setCenterX);
+                addColumn("Y", Double.class, Region2D::getCenterY, Region2D::setCenterY);
+                addColumn("R", Double.class, Region2D::getRadius, Region2D::setRadius);
                 addColumn(
                     "Min delay (s)",
                     Double.class,
-                    AudioChirp::getRegionMinDelaySeconds,
-                    AudioChirp::setRegionMinDelaySeconds
+                    ChirpEmitter::getRegionMinDelaySeconds,
+                    ChirpEmitter::setRegionMinDelaySeconds
                 );
                 addColumn(
                     "Max delay (s)",
                     Double.class,
-                    AudioChirp::getRegionMaxDelaySeconds,
-                    AudioChirp::setRegionMaxDelaySeconds
+                    ChirpEmitter::getRegionMaxDelaySeconds,
+                    ChirpEmitter::setRegionMaxDelaySeconds
                 );
                 addColumn(
                     "Base volume",
@@ -74,8 +69,7 @@ class SpatialRegionTable extends JTable {
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     var rowIndex = rowAtPoint(e.getPoint());
-                    popupFactory.createPopup(rowIndex)
-                        .show(SpatialRegionTable.this, e.getX(), e.getY());
+                    popupFactory.createPopup(rowIndex).show(EmitterTable.this, e.getX(), e.getY());
                 }
             }
 

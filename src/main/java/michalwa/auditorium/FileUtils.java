@@ -5,17 +5,21 @@ import java.awt.FileDialog;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import michalwa.auditorium.playback.AudioClip;
-import michalwa.auditorium.playback.SpatialAudio;
+import michalwa.auditorium.playback.ChirpEmitter;
+import michalwa.auditorium.playback.Emitter;
+import michalwa.auditorium.playback.LoopEmitter;
 
-class FilePicker {
-    private static final Logger logger = Logger.getLogger(FilePicker.class.getName());
+class FileUtils {
+    private static final Logger logger = Logger.getLogger(FileUtils.class.getName());
 
     public static void exportData(Object data) {
         var fileDialog = new FileDialog((Dialog)null, "Export project", FileDialog.SAVE);
@@ -42,7 +46,7 @@ class FilePicker {
 
         var file = fileDialog.getFiles()[0];
 
-        try (var ois = new ObjectInputStream(new FileInputStream(file))) {
+        try (var ois = new BackCompatObjectInputStream(new FileInputStream(file))) {
             var data = ois.readObject();
             logger.info("Imported " + file.getAbsolutePath());
             return data;
@@ -52,7 +56,7 @@ class FilePicker {
         }
     }
 
-    public static SpatialAudio loadAudio(AudioFactory factory) {
+    public static Emitter loadAudio(AudioFactory factory) {
         var fileDialog = new FileDialog((Dialog)null, "Open audio clip", FileDialog.LOAD);
         fileDialog.setMultipleMode(true);
         fileDialog.setVisible(true);
@@ -75,6 +79,30 @@ class FilePicker {
     }
 
     interface AudioFactory {
-        SpatialAudio createAudio(String name, AudioClip[] clips);
+        Emitter createAudio(String name, AudioClip[] clips);
+    }
+
+    private static class BackCompatObjectInputStream extends ObjectInputStream {
+        BackCompatObjectInputStream(InputStream is) throws IOException {
+            super(is);
+        }
+
+        @Override
+        protected ObjectStreamClass readClassDescriptor()
+            throws IOException,
+                ClassNotFoundException {
+            var desc = super.readClassDescriptor();
+
+            return switch (desc.getName()) {
+            case "michalwa.auditorium.playback.AudioChirp" -> ObjectStreamClass
+                .lookup(ChirpEmitter.class);
+            case "michalwa.auditorium.playback.AudioLoop" -> ObjectStreamClass
+                .lookup(LoopEmitter.class);
+            case "michalwa.auditorium.playback.SpatialAudio" -> ObjectStreamClass
+                .lookup(Emitter.class);
+            case "michalwa.auditorium.SpatialRegion" -> ObjectStreamClass.lookup(Region2D.class);
+            default -> desc;
+            };
+        }
     }
 }
