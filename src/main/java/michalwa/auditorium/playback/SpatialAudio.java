@@ -127,7 +127,12 @@ public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
     }
 
     @Override
-    public float getIntensity() {
+    public float getDynamicIntensity() {
         return baseVolume + 3.0f * levelReader.nextSmoothLevel();
+    }
+
+    @Override
+    public float getStaticIntensity() {
+        return baseVolume;
     }
 }

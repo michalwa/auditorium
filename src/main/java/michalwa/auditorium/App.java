@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.LogManager;
+
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -192,6 +194,9 @@ class App extends JFrame implements Runnable {
                     );
                 }
             });
+
+            add(new JCheckBoxMenuItem("Dynamic visualization", slider.isDynamicVisualizationEnabled()))
+                .addActionListener(e -> slider.setDynamicVisualizationEnabled(!slider.isDynamicVisualizationEnabled()));
         }
     }
 

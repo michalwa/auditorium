@@ -37,6 +37,7 @@ class SpatialSlider extends JComponent {
     private int padding = 20;
     private int roundSize = 6;
     private int handleRadius = 4;
+    private boolean dynamicVisualizationEnabled = true;
 
     private PopupFactory popupFactory;
 
@@ -109,6 +110,14 @@ class SpatialSlider extends JComponent {
         );
     }
 
+    public boolean isDynamicVisualizationEnabled() {
+        return dynamicVisualizationEnabled;
+    }
+
+    public void setDynamicVisualizationEnabled(boolean enabled) {
+        dynamicVisualizationEnabled = enabled;
+    }
+
     public Point2D getValue() {
         return value;
     }
@@ -140,7 +149,7 @@ class SpatialSlider extends JComponent {
             var cy = padding + region.getCenter().getY() * getAreaHeight();
             var r = region.getRadius() * Math.min(getAreaWidth(), getAreaHeight());
 
-            var intensity = region.getData().getIntensity();
+            var intensity = dynamicVisualizationEnabled ? region.getData().getDynamicIntensity() : region.getData().getStaticIntensity();
             var middleColorStop = 1.0001f - 1.0f / Math.max(intensity, 1.0f);
             var startColor = withAlpha(region.getColor(), (int)(Math.min(intensity, 1.0f) * 200));
             var endColor = withAlpha(region.getColor(), 0);

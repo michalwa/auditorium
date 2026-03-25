@@ -86,6 +86,14 @@ public class SpatialRegion<TData extends SpatialRegion.Data> implements Serializ
     }
 
     public interface Data {
-        float getIntensity();
+        /**
+         * @return an intensity value for visualization that may change over time
+         */
+        float getDynamicIntensity();
+
+        /**
+         * @return an intensity value for visualization that should not change over time
+         */
+        float getStaticIntensity();
     }
 }
