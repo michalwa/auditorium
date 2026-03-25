@@ -224,7 +224,8 @@ class App extends JFrame implements Runnable {
                     .add(
                         new JRadioButtonMenuItem(
                             preset.name,
-                            slider.isSmoothingEnabled() && slider.getSmoothingSpeed() == preset.speed
+                            slider.isSmoothingEnabled()
+                                && slider.getSmoothingSpeed() == preset.speed
                         )
                     )
                     .addActionListener(e -> {
