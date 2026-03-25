@@ -39,6 +39,7 @@ class SpatialSlider extends JComponent {
     private int handleRadius = 4;
     private boolean dynamicVisualizationEnabled = true;
     private boolean showAllGizmosEnabled = false;
+    private boolean showGuidesEnabled = false;
 
     private PopupFactory popupFactory;
 
@@ -138,8 +139,10 @@ class SpatialSlider extends JComponent {
         g2d.setColor(getForeground());
         g2d.setStroke(DASH_STROKE);
 
-        drawVerticalLine(g, padding + getAreaWidth() / 2, padding, getAreaHeight());
-        drawHorizontalLine(g, padding, padding + getAreaHeight() / 2, getAreaWidth());
+        if (showGuidesEnabled) {
+            drawVerticalLine(g, padding + getAreaWidth() / 2, padding, getAreaHeight());
+            drawHorizontalLine(g, padding, padding + getAreaHeight() / 2, getAreaWidth());
+        }
 
         g2d.setStroke(new BasicStroke());
 
@@ -192,6 +195,14 @@ class SpatialSlider extends JComponent {
 
         g2d.setColor(getForeground());
         g2d.drawRoundRect(padding, padding, getAreaWidth(), getAreaHeight(), roundSize, roundSize);
+    }
+
+    public boolean isShowGuidesEnabled() {
+        return showGuidesEnabled;
+    }
+
+    public void setShowGuidesEnabled(boolean enabled) {
+        showGuidesEnabled = enabled;
     }
 
     public void setDynamicVisualizationEnabled(boolean enabled) {

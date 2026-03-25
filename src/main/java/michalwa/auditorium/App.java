@@ -199,6 +199,11 @@ class App extends JFrame implements Runnable {
                 slider::setShowAllGizmosEnabled
             );
             addCheckbox(
+                "Show guides",
+                slider.isShowGuidesEnabled(),
+                slider::setShowGuidesEnabled
+            );
+            addCheckbox(
                 "Dynamic visualization",
                 slider.isDynamicVisualizationEnabled(),
                 slider::setDynamicVisualizationEnabled
