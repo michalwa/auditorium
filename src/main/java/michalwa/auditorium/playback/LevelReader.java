@@ -21,20 +21,10 @@ public class LevelReader implements AudioOperator {
 
     /**
      * @param windowSize the number of consecutive frames to take into account
-     *        when calculating the level
+     *                   when calculating the level
      */
     public LevelReader(int windowSize) {
         this.windowSize = windowSize;
-    }
-
-    @Override
-    public void nextFrame(int channels) {
-        if (samples.length != channels * windowSize) {
-            samples = new float[channels * windowSize];
-            sampleIndex = 0;
-        } else if (sampleIndex >= samples.length) {
-            sampleIndex = 0;
-        }
     }
 
     @Override
@@ -57,6 +47,16 @@ public class LevelReader implements AudioOperator {
         }
 
         return (max - min) / 2.0f;
+    }
+
+    @Override
+    public void nextFrame(int channels) {
+        if (samples.length != channels * windowSize) {
+            samples = new float[channels * windowSize];
+            sampleIndex = 0;
+        } else if (sampleIndex >= samples.length) {
+            sampleIndex = 0;
+        }
     }
 
     public float nextSmoothLevel() {

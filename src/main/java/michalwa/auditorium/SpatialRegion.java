@@ -25,14 +25,6 @@ public class SpatialRegion<TData extends SpatialRegion.Data> implements Serializ
         this.data = data;
     }
 
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
     public Point2D getCenter() {
         return center;
     }
@@ -61,6 +53,10 @@ public class SpatialRegion<TData extends SpatialRegion.Data> implements Serializ
         return radius * radius;
     }
 
+    public boolean isSelected() {
+        return selected;
+    }
+
     public boolean isVisible() {
         return visible;
     }
@@ -81,18 +77,24 @@ public class SpatialRegion<TData extends SpatialRegion.Data> implements Serializ
         this.radius = radius;
     }
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
 
     public interface Data {
         /**
-         * @return an intensity value for visualization that may change over time
+         * @return an intensity value for visualization that may change over
+         *         time
          */
         float getDynamicIntensity();
 
         /**
-         * @return an intensity value for visualization that should not change over time
+         * @return an intensity value for visualization that should not change
+         *         over time
          */
         float getStaticIntensity();
     }

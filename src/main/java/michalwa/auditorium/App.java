@@ -8,15 +8,14 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.LogManager;
-
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -69,14 +68,13 @@ class App extends JFrame implements Runnable {
         table.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.UPDATE)
-                    updateAudioLevels();
+                if (e.getType() == TableModelEvent.UPDATE) updateAudioLevels();
             }
         });
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-               	for (var i = e.getFirstIndex(); i <= e.getLastIndex(); i++) {
+                for (var i = e.getFirstIndex(); i <= e.getLastIndex(); i++) {
                     regions.get(i).setSelected(table.isRowSelected(i));
                 }
             }
@@ -195,8 +193,20 @@ class App extends JFrame implements Runnable {
                 }
             });
 
-            add(new JCheckBoxMenuItem("Dynamic visualization", slider.isDynamicVisualizationEnabled()))
-                .addActionListener(e -> slider.setDynamicVisualizationEnabled(!slider.isDynamicVisualizationEnabled()));
+            addCheckbox(
+                "Show all gizmos",
+                slider.isShowAllGizmosEnabled(),
+                slider::setShowAllGizmosEnabled
+            );
+            addCheckbox(
+                "Dynamic visualization",
+                slider.isDynamicVisualizationEnabled(),
+                slider::setDynamicVisualizationEnabled
+            );
+        }
+
+        private void addCheckbox(String text, boolean state, Consumer<Boolean> setter) {
+            add(new JCheckBoxMenuItem(text, state)).addActionListener(e -> setter.accept(!state));
         }
     }
 
@@ -207,7 +217,8 @@ class App extends JFrame implements Runnable {
                     .addActionListener(e -> { moveRegion(rowIndex, rowIndex - 1); });
                 add(new JMenuItem("Move down"))
                     .addActionListener(e -> { moveRegion(rowIndex, rowIndex + 1); });
-                add(new JMenuItem("Move to top")).addActionListener(e -> { moveRegion(rowIndex, 0); });
+                add(new JMenuItem("Move to top"))
+                    .addActionListener(e -> { moveRegion(rowIndex, 0); });
                 add(new JMenuItem("Move to bottom")).addActionListener(e -> {
                     moveRegion(rowIndex, regions.size() - 1);
                 });

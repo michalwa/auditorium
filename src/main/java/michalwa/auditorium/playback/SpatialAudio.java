@@ -39,12 +39,22 @@ public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
         return baseVolume;
     }
 
+    @Override
+    public float getDynamicIntensity() {
+        return baseVolume + 3.0f * levelReader.nextSmoothLevel();
+    }
+
     public String getName() {
         return name;
     }
 
     private AudioClip getRandomClip() {
         return clips[randomizer.next()];
+    }
+
+    @Override
+    public float getStaticIntensity() {
+        return baseVolume;
     }
 
     /**
@@ -124,15 +134,5 @@ public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
 
     public static void setRegionName(SpatialRegion<? extends SpatialAudio> region, String name) {
         region.getData().setName(name);
-    }
-
-    @Override
-    public float getDynamicIntensity() {
-        return baseVolume + 3.0f * levelReader.nextSmoothLevel();
-    }
-
-    @Override
-    public float getStaticIntensity() {
-        return baseVolume;
     }
 }

@@ -38,6 +38,7 @@ class SpatialSlider extends JComponent {
     private int roundSize = 6;
     private int handleRadius = 4;
     private boolean dynamicVisualizationEnabled = true;
+    private boolean showAllGizmosEnabled = false;
 
     private PopupFactory popupFactory;
 
@@ -110,16 +111,16 @@ class SpatialSlider extends JComponent {
         );
     }
 
+    public Point2D getValue() {
+        return value;
+    }
+
     public boolean isDynamicVisualizationEnabled() {
         return dynamicVisualizationEnabled;
     }
 
-    public void setDynamicVisualizationEnabled(boolean enabled) {
-        dynamicVisualizationEnabled = enabled;
-    }
-
-    public Point2D getValue() {
-        return value;
+    public boolean isShowAllGizmosEnabled() {
+        return showAllGizmosEnabled;
     }
 
     @Override
@@ -149,7 +150,9 @@ class SpatialSlider extends JComponent {
             var cy = padding + region.getCenter().getY() * getAreaHeight();
             var r = region.getRadius() * Math.min(getAreaWidth(), getAreaHeight());
 
-            var intensity = dynamicVisualizationEnabled ? region.getData().getDynamicIntensity() : region.getData().getStaticIntensity();
+            var intensity = dynamicVisualizationEnabled
+                ? region.getData().getDynamicIntensity()
+                : region.getData().getStaticIntensity();
             var middleColorStop = 1.0001f - 1.0f / Math.max(intensity, 1.0f);
             var startColor = withAlpha(region.getColor(), (int)(Math.min(intensity, 1.0f) * 200));
             var endColor = withAlpha(region.getColor(), 0);
@@ -165,7 +168,7 @@ class SpatialSlider extends JComponent {
             );
             g2d.fillOval((int)(cx - r), (int)(cy - r), (int)(r * 2), (int)(r * 2));
 
-            if (region.isSelected()) {
+            if (showAllGizmosEnabled || region.isSelected()) {
                 g2d.setColor(region.getColor());
                 g2d.setStroke(new BasicStroke());
                 g2d.drawLine((int)cx - 5, (int)cy, (int)cx + 5, (int)cy);
@@ -189,6 +192,14 @@ class SpatialSlider extends JComponent {
 
         g2d.setColor(getForeground());
         g2d.drawRoundRect(padding, padding, getAreaWidth(), getAreaHeight(), roundSize, roundSize);
+    }
+
+    public void setDynamicVisualizationEnabled(boolean enabled) {
+        dynamicVisualizationEnabled = enabled;
+    }
+
+    public void setShowAllGizmosEnabled(boolean enabled) {
+        showAllGizmosEnabled = enabled;
     }
 
     public void setValue(Point2D value) {
