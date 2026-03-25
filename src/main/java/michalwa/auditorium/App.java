@@ -2,6 +2,8 @@ package michalwa.auditorium;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -83,7 +85,24 @@ class App extends JFrame implements Runnable {
 
         setTitle("auditorium " + getClass().getPackage().getImplementationVersion());
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (
+                    JOptionPane.showConfirmDialog(
+                        App.this,
+                        "Are you sure you want to exit? Unsaved changes will be lost",
+                        "Exit",
+                        JOptionPane.OK_CANCEL_OPTION
+                    ) == JOptionPane.OK_OPTION
+                ) {
+                    System.exit(0);
+                }
+            }
+        });
+
         setVisible(true);
     }
 
@@ -189,14 +208,16 @@ class App extends JFrame implements Runnable {
 
             add(new JMenuItem("Delete all")).addActionListener(e -> {
                 var title = ((JMenuItem)e.getSource()).getText();
-                var choice = JOptionPane.showConfirmDialog(
-                    getInvoker(),
-                    "Delete all regions?",
-                    title,
-                    JOptionPane.YES_NO_OPTION
-                );
-
-                if (choice == JOptionPane.YES_OPTION) clearRegions();
+                if (
+                    JOptionPane.showConfirmDialog(
+                        getInvoker(),
+                        "Delete all regions?",
+                        title,
+                        JOptionPane.OK_CANCEL_OPTION
+                    ) == JOptionPane.OK_OPTION
+                ) {
+                    clearRegions();
+                }
             });
         }
     }
