@@ -12,9 +12,11 @@ import java.util.function.Consumer;
 import java.util.logging.LogManager;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -26,9 +28,17 @@ import michalwa.auditorium.playback.AudioLoop;
 import michalwa.auditorium.playback.SpatialAudio;
 
 class App extends JFrame implements Runnable {
+    private static final SmoothingPreset[] SMOOTHING_PRESETS = new SmoothingPreset[] {
+        new SmoothingPreset("Subtle", 0.3),
+        new SmoothingPreset("Moderate", 0.2),
+        new SmoothingPreset("Heavy", 0.1),
+        new SmoothingPreset("Sluggish", 0.02) };
+
     List<SpatialRegion<SpatialAudio>> regions = new ArrayList<>();
     SpatialSlider slider;
     SpatialRegionTable table;
+
+    record SmoothingPreset(String name, double speed) {}
 
     private void addRegion(SpatialRegion<SpatialAudio> region) {
         regions.add(region);
@@ -198,16 +208,32 @@ class App extends JFrame implements Runnable {
                 slider.isShowAllGizmosEnabled(),
                 slider::setShowAllGizmosEnabled
             );
-            addCheckbox(
-                "Show guides",
-                slider.isShowGuidesEnabled(),
-                slider::setShowGuidesEnabled
-            );
+            addCheckbox("Show guides", slider.isShowGuidesEnabled(), slider::setShowGuidesEnabled);
             addCheckbox(
                 "Dynamic visualization",
                 slider.isDynamicVisualizationEnabled(),
                 slider::setDynamicVisualizationEnabled
             );
+
+            var smoothingMenu = new JMenu("Smoothing");
+            smoothingMenu.add(new JRadioButtonMenuItem("None", !slider.isSmoothingEnabled()))
+                .addActionListener(e -> slider.setSmoothingEnabled(false));
+
+            for (var preset : SMOOTHING_PRESETS) {
+                smoothingMenu
+                    .add(
+                        new JRadioButtonMenuItem(
+                            preset.name,
+                            slider.isSmoothingEnabled() && slider.getSmoothingSpeed() == preset.speed
+                        )
+                    )
+                    .addActionListener(e -> {
+                        slider.setSmoothingEnabled(true);
+                        slider.setSmoothingSpeed(preset.speed);
+                    });
+            }
+
+            add(smoothingMenu);
         }
 
         private void addCheckbox(String text, boolean state, Consumer<Boolean> setter) {

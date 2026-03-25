@@ -40,13 +40,16 @@ class SpatialSlider extends JComponent {
     private boolean dynamicVisualizationEnabled = true;
     private boolean showAllGizmosEnabled = false;
     private boolean showGuidesEnabled = false;
+    private boolean smoothingEnabled = true;
+    private double smoothingSpeed = 0.2;
 
     private PopupFactory popupFactory;
 
     private Point2D value = new Point2D.Double(0.5, 0.5);
+    private Point2D targetValue = new Point2D.Double(0.5, 0.5);
     private List<? extends SpatialRegion<?>> regions;
 
-    private final Timer repaintTimer;
+    private final Timer updateTimer;
 
     SpatialSlider(List<? extends SpatialRegion<?>> regions, PopupFactory popupFactory) {
         this.regions = regions;
@@ -59,13 +62,13 @@ class SpatialSlider extends JComponent {
         var mouseAdapter = new MouseAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) setValue(getNewValue(e));
+                if (SwingUtilities.isLeftMouseButton(e)) setTargetValue(getNewValue(e));
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
                 if (e.isPopupTrigger()) showContextMenu(e);
-                if (SwingUtilities.isLeftMouseButton(e)) setValue(getNewValue(e));
+                if (SwingUtilities.isLeftMouseButton(e)) setTargetValue(getNewValue(e));
             }
 
             @Override
@@ -77,8 +80,8 @@ class SpatialSlider extends JComponent {
         addMouseListener(mouseAdapter);
         addMouseMotionListener(mouseAdapter);
 
-        repaintTimer = new Timer(30, e -> repaint());
-        repaintTimer.start();
+        updateTimer = new Timer(15, e -> update());
+        updateTimer.start();
     }
 
     private void drawHorizontalLine(Graphics g, int x, int y, int width) {
@@ -112,6 +115,10 @@ class SpatialSlider extends JComponent {
         );
     }
 
+    public double getSmoothingSpeed() {
+        return smoothingSpeed;
+    }
+
     public Point2D getValue() {
         return value;
     }
@@ -122,6 +129,14 @@ class SpatialSlider extends JComponent {
 
     public boolean isShowAllGizmosEnabled() {
         return showAllGizmosEnabled;
+    }
+
+    public boolean isShowGuidesEnabled() {
+        return showGuidesEnabled;
+    }
+
+    public boolean isSmoothingEnabled() {
+        return smoothingEnabled;
     }
 
     @Override
@@ -197,14 +212,6 @@ class SpatialSlider extends JComponent {
         g2d.drawRoundRect(padding, padding, getAreaWidth(), getAreaHeight(), roundSize, roundSize);
     }
 
-    public boolean isShowGuidesEnabled() {
-        return showGuidesEnabled;
-    }
-
-    public void setShowGuidesEnabled(boolean enabled) {
-        showGuidesEnabled = enabled;
-    }
-
     public void setDynamicVisualizationEnabled(boolean enabled) {
         dynamicVisualizationEnabled = enabled;
     }
@@ -213,16 +220,44 @@ class SpatialSlider extends JComponent {
         showAllGizmosEnabled = enabled;
     }
 
-    public void setValue(Point2D value) {
-        var oldValue = this.value;
-        this.value = value;
+    public void setShowGuidesEnabled(boolean enabled) {
+        showGuidesEnabled = enabled;
+    }
 
-        firePropertyChange("value", oldValue, value);
-        repaint();
+    public void setSmoothingEnabled(boolean enabled) {
+        this.smoothingEnabled = enabled;
+    }
+
+    public void setSmoothingSpeed(double speed) {
+        smoothingSpeed = speed;
+    }
+
+    public void setTargetValue(Point2D targetValue) {
+        this.targetValue = targetValue;
+
+        if (!smoothingEnabled) {
+            var oldValue = value;
+            value = targetValue;
+            firePropertyChange("value", oldValue, value);
+        }
     }
 
     private void showContextMenu(MouseEvent e) {
         popupFactory.createPopup(getNewValue(e)).show(e.getComponent(), e.getX(), e.getY());
+    }
+
+    private void update() {
+        if (smoothingEnabled) {
+            var oldValue = value;
+            value = new Point2D.Double(
+                value.getX() + (targetValue.getX() - value.getX()) * smoothingSpeed,
+                value.getY() + (targetValue.getY() - value.getY()) * smoothingSpeed
+            );
+
+            firePropertyChange("value", oldValue, value);
+        }
+
+        repaint();
     }
 
     private Color withAlpha(Color c, int alpha) {
