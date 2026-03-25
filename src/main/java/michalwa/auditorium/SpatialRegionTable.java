@@ -53,10 +53,13 @@ class SpatialRegionTable extends JTable {
             }
         });
 
-        ColorCellEditor colorCellEditor = new ColorCellEditor();
+        var colorCellEditor = new ColorCellEditor();
+        var numberCellRenderer = new NumberCellRenderer();
 
         setDefaultEditor(Color.class, colorCellEditor);
         setDefaultRenderer(Color.class, colorCellEditor);
+        setDefaultRenderer(Double.class, numberCellRenderer);
+        setDefaultRenderer(Float.class, numberCellRenderer);
 
         getColumnModel().getColumn(0).setPreferredWidth(24);
         getColumnModel().getColumn(0).setResizable(false);

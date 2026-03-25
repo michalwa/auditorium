@@ -88,7 +88,7 @@ public class AudioClip implements Serializable {
             count /= 1024;
         }
 
-        return String.format(Locale.of("en"), "%.1f %s", count, unit);
+        return String.format(Locale.US, "%.1f %s", count, unit);
     }
 
     private static String humanChannels(int channels) {
