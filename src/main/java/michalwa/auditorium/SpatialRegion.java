@@ -4,10 +4,11 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
-public class SpatialRegion<TData> implements Serializable {
+public class SpatialRegion<TData extends SpatialRegion.Data> implements Serializable {
     private static final long serialVersionUID = 2026_03_06_001L;
     private static final double DEFAULT_RADIUS = 0.4;
 
+    private transient boolean selected = false;
     private boolean visible = true;
     private Point2D center;
     private double radius;
@@ -22,6 +23,14 @@ public class SpatialRegion<TData> implements Serializable {
         this.center = center;
         this.radius = radius;
         this.data = data;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     public Point2D getCenter() {
@@ -74,5 +83,9 @@ public class SpatialRegion<TData> implements Serializable {
 
     public void setVisible(boolean visible) {
         this.visible = visible;
+    }
+
+    public interface Data {
+        float getIntensity();
     }
 }

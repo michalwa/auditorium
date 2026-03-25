@@ -19,5 +19,10 @@ public interface AudioOperator {
      * define update logic which needs to happen periodically, like gradual
      * value changes.
      */
-    void nextFrame();
+    default void nextFrame(int channels) {}
+
+    /**
+     * Called when the end of the audio clip is reached
+     */
+    default void finished() {}
 }

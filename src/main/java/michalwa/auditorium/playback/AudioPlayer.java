@@ -96,7 +96,7 @@ public class AudioPlayer implements Runnable {
                     }
                 }
 
-                for (var operator : operators) operator.nextFrame();
+                for (var operator : operators) operator.nextFrame(channels);
 
                 for (var channel = 0; channel < channels; channel++) {
                     var shortSample = readBuffer
@@ -114,6 +114,8 @@ public class AudioPlayer implements Runnable {
 
             dataLine.write(writeBuffer.array(), 0, writeBuffer.position());
         }
+
+        for (var operator : operators) operator.finished();
 
         dataLine.stop();
         dataLine.close();

@@ -15,6 +15,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import michalwa.auditorium.playback.AudioChirp;
@@ -30,14 +32,12 @@ class App extends JFrame implements Runnable {
         regions.add(region);
         region.getData().initialize();
         updateAudioLevels();
-        slider.repaint();
         table.revalidate();
     }
 
     private void clearRegions() {
         for (var region : regions) region.getData().kill();
         regions.clear();
-        slider.repaint();
         table.revalidate();
     }
 
@@ -46,7 +46,6 @@ class App extends JFrame implements Runnable {
 
         regions.add(j, regions.remove(i));
 
-        slider.repaint();
         table.revalidate();
         table.repaint();
     }
@@ -54,7 +53,6 @@ class App extends JFrame implements Runnable {
     private void removeRegion(int index) {
         regions.get(index).getData().kill();
         regions.remove(index);
-        slider.repaint();
         table.revalidate();
     }
 
@@ -68,9 +66,15 @@ class App extends JFrame implements Runnable {
         table.getModel().addTableModelListener(new TableModelListener() {
             @Override
             public void tableChanged(TableModelEvent e) {
-                if (e.getType() == TableModelEvent.UPDATE) {
+                if (e.getType() == TableModelEvent.UPDATE)
                     updateAudioLevels();
-                    slider.repaint();
+            }
+        });
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+               	for (var i = e.getFirstIndex(); i <= e.getLastIndex(); i++) {
+                    regions.get(i).setSelected(table.isRowSelected(i));
                 }
             }
         });
@@ -109,7 +113,6 @@ class App extends JFrame implements Runnable {
     private void setAllRegionsVisible(boolean visible) {
         for (var region : regions) region.setVisible(visible);
 
-        slider.repaint();
         table.revalidate();
         table.repaint();
     }
