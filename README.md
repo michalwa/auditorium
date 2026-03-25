@@ -31,7 +31,9 @@ Manual:
   - **Base volume** &ndash; constant volume multiplier, the effective volume is _Base volume &times; Attenuation volume (1 when in the center, 0 when out of range)_
 - Use the mouse wheel when hovering over a selected numeric cell to adjust the value.
 - Right-click in the bottom table to delete a region, or to delete all regions.
-- In the 2D area menu you can also import/export entire projects. Importing will add saved regions to the current project. Exporting will save all currently added audio regions.
+- In the 2D area menu you can also import/export entire projects. Importing will add saved regions to the current project. Exporting will save all currently added audio regions together with embedded audio data, so you don't need to worry about keeping the original audio files around.
+
+Only a small subset of audio file formats are currently supported, mainly WAV and AIFF.
 
 ## Development
 
