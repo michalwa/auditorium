@@ -5,6 +5,7 @@ package michalwa.auditorium.playback;
  */
 public class LevelReader implements AudioOperator {
     private static final int DEFAULT_WINDOW_SIZE = 256;
+    private static final float SMOOTH_LEVEL_SPEED = 0.3f;
 
     private final int windowSize;
     /**
@@ -58,8 +59,8 @@ public class LevelReader implements AudioOperator {
         return (max - min) / 2.0f;
     }
 
-    public float getSmoothLevel() {
-        smoothLevel += (getLevel() - smoothLevel) * 0.3f;
+    public float nextSmoothLevel() {
+        smoothLevel += (getLevel() - smoothLevel) * SMOOTH_LEVEL_SPEED;
         return smoothLevel;
     }
 }

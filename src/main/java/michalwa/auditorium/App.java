@@ -14,6 +14,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -81,6 +82,7 @@ class App extends JFrame implements Runnable {
 
         var tableScrollPane = new JScrollPane(table);
         tableScrollPane.setPreferredSize(new Dimension(400, 100));
+        tableScrollPane.setComponentPopupMenu(new TablePopupMenu(-1));
 
         add(slider, BorderLayout.CENTER);
         add(tableScrollPane, BorderLayout.SOUTH);
@@ -195,19 +197,24 @@ class App extends JFrame implements Runnable {
 
     class TablePopupMenu extends JPopupMenu {
         TablePopupMenu(int rowIndex) {
-            add(new JMenuItem("Move up"))
-                .addActionListener(e -> { moveRegion(rowIndex, rowIndex - 1); });
-            add(new JMenuItem("Move down"))
-                .addActionListener(e -> { moveRegion(rowIndex, rowIndex + 1); });
-            add(new JMenuItem("Move to top")).addActionListener(e -> { moveRegion(rowIndex, 0); });
-            add(new JMenuItem("Move to bottom")).addActionListener(e -> {
-                moveRegion(rowIndex, regions.size() - 1);
-            });
+            if (rowIndex >= 0) {
+                add(new JMenuItem("Move up"))
+                    .addActionListener(e -> { moveRegion(rowIndex, rowIndex - 1); });
+                add(new JMenuItem("Move down"))
+                    .addActionListener(e -> { moveRegion(rowIndex, rowIndex + 1); });
+                add(new JMenuItem("Move to top")).addActionListener(e -> { moveRegion(rowIndex, 0); });
+                add(new JMenuItem("Move to bottom")).addActionListener(e -> {
+                    moveRegion(rowIndex, regions.size() - 1);
+                });
+            }
 
             add(new JMenuItem("Show all")).addActionListener(e -> setAllRegionsVisible(true));
             add(new JMenuItem("Hide all")).addActionListener(e -> setAllRegionsVisible(false));
+            add(new JMenuItem("Clear selection")).addActionListener(e -> table.clearSelection());
 
-            add(new JMenuItem("Delete")).addActionListener(e -> { removeRegion(rowIndex); });
+            if (rowIndex >= 0) {
+                add(new JMenuItem("Delete")).addActionListener(e -> { removeRegion(rowIndex); });
+            }
 
             add(new JMenuItem("Delete all")).addActionListener(e -> {
                 var title = ((JMenuItem)e.getSource()).getText();

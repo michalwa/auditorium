@@ -84,8 +84,8 @@ public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
 
         try {
             player = new AudioPlayer(getRandomClip(), looping);
-            player.addOperator(volumeOperator);
             player.addOperator(levelReader);
+            player.addOperator(volumeOperator);
             player.addFinishListener(this::finished);
             player.start();
         } catch (LineUnavailableException e) {
@@ -128,6 +128,6 @@ public abstract class SpatialAudio implements Serializable, SpatialRegion.Data {
 
     @Override
     public float getIntensity() {
-        return 10.0f * (1.0f - (float)Math.pow(1.0f - levelReader.getSmoothLevel(), 5.0f));
+        return baseVolume + 3.0f * levelReader.nextSmoothLevel();
     }
 }
