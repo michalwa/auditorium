@@ -1,5 +1,8 @@
 package michalwa.auditorium;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.jthemedetecor.OsThemeDetector;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
@@ -10,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.LogManager;
+import java.util.stream.Stream;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -70,6 +75,17 @@ class App extends JFrame implements Runnable {
 
     @Override
     public void run() {
+        OsThemeDetector.getDetector().registerListener(this::setDarkThemeEnabled);
+        setDarkThemeEnabled(OsThemeDetector.getDetector().isDark());
+
+        var icons = new ImageIcon[] {
+            new ImageIcon(App.class.getClassLoader().getResource("icon_32.png")),
+            new ImageIcon(App.class.getClassLoader().getResource("icon_64.png")),
+            new ImageIcon(App.class.getClassLoader().getResource("icon_128.png")),
+            new ImageIcon(App.class.getClassLoader().getResource("icon_256.png")),
+            new ImageIcon(App.class.getClassLoader().getResource("icon_512.png")), };
+        setIconImages(Stream.of(icons).map(ImageIcon::getImage).toList());
+
         slider = new Slider2D(regions, SliderPopupMenu::new);
         slider.setPreferredSize(new Dimension(400, 400));
         slider.addPropertyChangeListener("value", e -> updateAudioLevels());
@@ -127,6 +143,13 @@ class App extends JFrame implements Runnable {
 
         table.revalidate();
         table.repaint();
+    }
+
+    private void setDarkThemeEnabled(boolean enabled) {
+        if (enabled) FlatDarkLaf.setup();
+        else FlatLightLaf.setup();
+
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     private void updateAudioLevels() {
