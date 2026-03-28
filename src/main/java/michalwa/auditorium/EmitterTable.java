@@ -56,10 +56,10 @@ class EmitterTable extends JTable {
         setDefaultRenderer(Double.class, numberCellRenderer);
         setDefaultRenderer(Float.class, numberCellRenderer);
 
-        getColumnModel().getColumn(0).setPreferredWidth(24);
+        getColumnModel().getColumn(0).setPreferredWidth(32);
         getColumnModel().getColumn(0).setResizable(false);
 
-        getColumnModel().getColumn(1).setPreferredWidth(24);
+        getColumnModel().getColumn(1).setPreferredWidth(32);
         getColumnModel().getColumn(1).setResizable(false);
 
         getColumnModel().getColumn(3).setPreferredWidth(300);

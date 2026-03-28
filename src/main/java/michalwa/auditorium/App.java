@@ -23,6 +23,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
+
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.jthemedetecor.OsThemeDetector;
+
 import michalwa.auditorium.playback.ChirpEmitter;
 import michalwa.auditorium.playback.Emitter;
 import michalwa.auditorium.playback.LoopEmitter;
@@ -70,6 +76,9 @@ class App extends JFrame implements Runnable {
 
     @Override
     public void run() {
+        OsThemeDetector.getDetector().registerListener(this::setDarkThemeEnabled);
+        setDarkThemeEnabled(OsThemeDetector.getDetector().isDark());
+
         slider = new Slider2D(regions, SliderPopupMenu::new);
         slider.setPreferredSize(new Dimension(400, 400));
         slider.addPropertyChangeListener("value", e -> updateAudioLevels());
@@ -145,6 +154,13 @@ class App extends JFrame implements Runnable {
         LogManager.getLogManager().readConfiguration(logConfig);
 
         SwingUtilities.invokeLater(new App());
+    }
+
+    private void setDarkThemeEnabled(boolean enabled) {
+        if (enabled) FlatDarkLaf.setup();
+        else FlatLightLaf.setup();
+
+        SwingUtilities.updateComponentTreeUI(this);
     }
 
     private static double squareDistance(Point2D a, Point2D b) {
