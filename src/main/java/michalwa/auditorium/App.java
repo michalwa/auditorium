@@ -1,5 +1,8 @@
 package michalwa.auditorium;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.jthemedetecor.OsThemeDetector;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowAdapter;
@@ -11,7 +14,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.LogManager;
 import java.util.stream.Stream;
-
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
@@ -26,11 +28,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
-import com.jthemedetecor.OsThemeDetector;
-
 import michalwa.auditorium.playback.ChirpEmitter;
 import michalwa.auditorium.playback.Emitter;
 import michalwa.auditorium.playback.LoopEmitter;
@@ -86,8 +83,7 @@ class App extends JFrame implements Runnable {
             new ImageIcon(App.class.getClassLoader().getResource("icon_64.png")),
             new ImageIcon(App.class.getClassLoader().getResource("icon_128.png")),
             new ImageIcon(App.class.getClassLoader().getResource("icon_256.png")),
-            new ImageIcon(App.class.getClassLoader().getResource("icon_512.png")),
-        };
+            new ImageIcon(App.class.getClassLoader().getResource("icon_512.png")), };
         setIconImages(Stream.of(icons).map(ImageIcon::getImage).toList());
 
         slider = new Slider2D(regions, SliderPopupMenu::new);
@@ -149,6 +145,13 @@ class App extends JFrame implements Runnable {
         table.repaint();
     }
 
+    private void setDarkThemeEnabled(boolean enabled) {
+        if (enabled) FlatDarkLaf.setup();
+        else FlatLightLaf.setup();
+
+        SwingUtilities.updateComponentTreeUI(this);
+    }
+
     private void updateAudioLevels() {
         for (Region2D<Emitter> region : regions) {
             var squareDist = squareDistance(slider.getValue(), region.getCenter());
@@ -165,13 +168,6 @@ class App extends JFrame implements Runnable {
         LogManager.getLogManager().readConfiguration(logConfig);
 
         SwingUtilities.invokeLater(new App());
-    }
-
-    private void setDarkThemeEnabled(boolean enabled) {
-        if (enabled) FlatDarkLaf.setup();
-        else FlatLightLaf.setup();
-
-        SwingUtilities.updateComponentTreeUI(this);
     }
 
     private static double squareDistance(Point2D a, Point2D b) {

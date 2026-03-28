@@ -122,8 +122,7 @@ class EmitterTable extends JTable {
     }
 
     private boolean isCellAdjustableWithScrollWheel(int rowIndex, int columnIndex) {
-        var isCellSelected = rowIndex == getSelectedRow()
-            && columnIndex == getSelectedColumn();
+        var isCellSelected = rowIndex == getSelectedRow() && columnIndex == getSelectedColumn();
         var isCellEditable = getModel().isCellEditable(rowIndex, columnIndex);
         var columnClass = getModel().getColumnClass(columnIndex);
 
