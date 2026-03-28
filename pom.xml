@@ -7,7 +7,7 @@
   <groupId>michalwa.auditorium</groupId>
   <artifactId>auditorium</artifactId>
   <packaging>jar</packaging>
-  <version>0.4.0</version>
+  <version>0.5.0</version>
   <name>auditorium</name>
   <url>http://maven.apache.org</url>
 
