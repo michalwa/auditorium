@@ -1,6 +1,7 @@
 package michalwa.auditorium;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -56,15 +57,35 @@ class EmitterTable extends JTable {
         setDefaultRenderer(Double.class, numberCellRenderer);
         setDefaultRenderer(Float.class, numberCellRenderer);
 
-        getColumnModel().getColumn(0).setPreferredWidth(32);
-        getColumnModel().getColumn(0).setResizable(false);
+        var columnModel = getColumnModel();
 
-        getColumnModel().getColumn(1).setPreferredWidth(32);
-        getColumnModel().getColumn(1).setResizable(false);
+        columnModel.getColumn(0).setPreferredWidth(32);
+        columnModel.getColumn(0).setResizable(false);
 
-        getColumnModel().getColumn(3).setPreferredWidth(300);
+        columnModel.getColumn(1).setPreferredWidth(32);
+        columnModel.getColumn(1).setResizable(false);
+
+        columnModel.getColumn(2).setPreferredWidth(100);
+
+        columnModel.getColumn(3).setPreferredWidth(300);
 
         var mouseAdapter = new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                var rowIndex = rowAtPoint(e.getPoint());
+                var columnIndex = columnAtPoint(e.getPoint());
+
+                updateCursor(rowIndex, columnIndex);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                var rowIndex = rowAtPoint(e.getPoint());
+                var columnIndex = columnAtPoint(e.getPoint());
+
+                updateCursor(rowIndex, columnIndex);
+            }
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (e.isPopupTrigger()) {
@@ -78,23 +99,14 @@ class EmitterTable extends JTable {
                 var rowIndex = rowAtPoint(e.getPoint());
                 var columnIndex = columnAtPoint(e.getPoint());
 
-                var isCellSelected = rowIndex == getSelectedRow()
-                    && columnIndex == getSelectedColumn();
-                var isCellEditable = getModel().isCellEditable(rowIndex, columnIndex);
-                var columnClass = getModel().getColumnClass(columnIndex);
-
-                if (
-                    isCellSelected
-                        && isCellEditable
-                        && (columnClass == Double.class || columnClass == Float.class)
-                ) {
+                if (isCellAdjustableWithScrollWheel(rowIndex, columnIndex)) {
                     var currentValue = (Number)getModel().getValueAt(rowIndex, columnIndex);
                     var newValue = currentValue.doubleValue()
                         - e.getPreciseWheelRotation() * NUMBER_SCROLL_STEP;
 
-                    if (columnClass == Double.class) {
+                    if (currentValue instanceof Double) {
                         getModel().setValueAt(Double.valueOf(newValue), rowIndex, columnIndex);
-                    } else if (columnClass == Float.class) {
+                    } else if (currentValue instanceof Float) {
                         getModel()
                             .setValueAt(Float.valueOf((float)newValue), rowIndex, columnIndex);
                     }
@@ -105,7 +117,27 @@ class EmitterTable extends JTable {
         };
 
         addMouseListener(mouseAdapter);
+        addMouseMotionListener(mouseAdapter);
         addMouseWheelListener(mouseAdapter);
+    }
+
+    private boolean isCellAdjustableWithScrollWheel(int rowIndex, int columnIndex) {
+        var isCellSelected = rowIndex == getSelectedRow()
+            && columnIndex == getSelectedColumn();
+        var isCellEditable = getModel().isCellEditable(rowIndex, columnIndex);
+        var columnClass = getModel().getColumnClass(columnIndex);
+
+        return isCellSelected
+            && isCellEditable
+            && (columnClass == Double.class || columnClass == Float.class);
+    }
+
+    private void updateCursor(int rowIndex, int columnIndex) {
+        if (isCellAdjustableWithScrollWheel(rowIndex, columnIndex)) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+        } else {
+            setCursor(null);
+        }
     }
 
     interface PopupFactory {
