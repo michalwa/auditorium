@@ -1,4 +1,4 @@
-# auditorium
+# ![icon](src/main/resources/icon_64.png) auditorium
 
 Soundscape playback tool for playing ambient audio for immersion, focus, tabletop games, or live performance
 

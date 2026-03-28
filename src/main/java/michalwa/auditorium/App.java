@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.LogManager;
+import java.util.stream.Stream;
+
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -77,6 +80,15 @@ class App extends JFrame implements Runnable {
     public void run() {
         OsThemeDetector.getDetector().registerListener(this::setDarkThemeEnabled);
         setDarkThemeEnabled(OsThemeDetector.getDetector().isDark());
+
+        var icons = new ImageIcon[] {
+            new ImageIcon(App.class.getClassLoader().getResource("icon_32.png")),
+            new ImageIcon(App.class.getClassLoader().getResource("icon_64.png")),
+            new ImageIcon(App.class.getClassLoader().getResource("icon_128.png")),
+            new ImageIcon(App.class.getClassLoader().getResource("icon_256.png")),
+            new ImageIcon(App.class.getClassLoader().getResource("icon_512.png")),
+        };
+        setIconImages(Stream.of(icons).map(ImageIcon::getImage).toList());
 
         slider = new Slider2D(regions, SliderPopupMenu::new);
         slider.setPreferredSize(new Dimension(400, 400));
